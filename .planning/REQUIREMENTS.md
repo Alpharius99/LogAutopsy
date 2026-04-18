@@ -69,14 +69,24 @@
 
 ## Traceability
 
-<!-- Filled by roadmap after phase mapping -->
-
-| REQ-ID | Phase |
-|--------|-------|
-| LOAD-01, LOAD-02 | — |
-| PARSE-01, PARSE-02, PARSE-03 | — |
-| DETECT-01, DETECT-02, DETECT-03 | — |
-| RESULTS-01, RESULTS-02, RESULTS-03 | — |
-| DETAIL-01, DETAIL-02, DETAIL-03 | — |
-| AI-01, AI-02, AI-03 | — |
-| GITLAB-01, GITLAB-02 | — |
+| REQ-ID | Phase | Status |
+|--------|-------|--------|
+| LOAD-01 | Phase 2 — Parsing Pipeline | Pending |
+| LOAD-02 | Phase 2 — Parsing Pipeline | Pending |
+| PARSE-01 | Phase 2 — Parsing Pipeline | Pending |
+| PARSE-02 | Phase 2 — Parsing Pipeline | Pending |
+| PARSE-03 | Phase 2 — Parsing Pipeline | Pending |
+| DETECT-01 | Phase 2 — Parsing Pipeline | Pending |
+| DETECT-02 | Phase 2 — Parsing Pipeline | Pending |
+| DETECT-03 | Phase 2 — Parsing Pipeline | Pending |
+| RESULTS-01 | Phase 3 — Results UI | Pending |
+| RESULTS-02 | Phase 3 — Results UI | Pending |
+| RESULTS-03 | Phase 3 — Results UI | Pending |
+| DETAIL-01 | Phase 3 — Results UI | Pending |
+| AI-01 | Phase 4 — Symbol Resolution | Pending |
+| AI-03 | Phase 4 — Symbol Resolution | Pending |
+| AI-02 | Phase 5 — Continue Integration | Pending |
+| DETAIL-02 | Phase 5 — Continue Integration | Pending |
+| DETAIL-03 | Phase 5 — Continue Integration | Pending |
+| GITLAB-01 | Phase 6 — GitLab Content | Pending |
+| GITLAB-02 | Phase 6 — GitLab Content | Pending |
