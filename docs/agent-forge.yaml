@@ -1,0 +1,212 @@
+agent:
+  name: RootCauseAnalyzerAgent
+  description: >
+    Performs structured root cause analysis for test failures using
+    stack traces, logs, and C# code context.
+
+  input_schema:
+    type: object
+    required:
+      - exception_type
+      - error_message
+      - stacktrace
+      - step
+      - phase
+      - code_context
+    properties:
+      exception_type:
+        type: string
+      error_message:
+        type: string
+      stacktrace:
+        type: string
+      step:
+        type: string
+      phase:
+        type: string
+      code_context:
+        type: object
+        required: [class, method, code]
+        properties:
+          class:
+            type: string
+          method:
+            type: string
+          code:
+            type: string
+
+  output_schema:
+    type: object
+    required:
+      - root_cause
+      - hypothesis
+      - fix_suggestion
+      - confidence
+    properties:
+      root_cause:
+        type: string
+      hypothesis:
+        type: object
+        required: [cause, mechanism, trigger]
+        properties:
+          cause:
+            type: string
+          mechanism:
+            type: string
+          trigger:
+            type: string
+      fix_suggestion:
+        type: string
+      confidence:
+        type: number
+
+workflow:
+  steps:
+
+    - id: extract_context
+      description: Extract structured failure information
+      prompt: |
+        Extract structured information from the failure.
+
+        Return JSON with:
+        - exception_type
+        - method (from stack trace)
+        - operation (failing action)
+
+      output_schema:
+        type: object
+        required: [exception_type, method, operation]
+        properties:
+          exception_type: { type: string }
+          method: { type: string }
+          operation: { type: string }
+
+    - id: identify_failure_point
+      description: Identify exact failure location
+      depends_on: [extract_context]
+      prompt: |
+        Using the stack trace and code, identify the exact failure point.
+
+        Be precise. Do not generalize.
+
+        Return JSON:
+        - failure_point
+        - line_hint
+
+      output_schema:
+        type: object
+        required: [failure_point]
+        properties:
+          failure_point: { type: string }
+          line_hint: { type: number }
+
+    - id: analyze_code
+      description: Analyze method behavior
+      depends_on: [identify_failure_point]
+      prompt: |
+        Analyze the provided method.
+
+        Explain:
+        - what the method does
+        - critical variables
+        - potential null or failure points
+
+        Return JSON:
+        - summary
+        - risk_points (array)
+
+      output_schema:
+        type: object
+        required: [summary, risk_points]
+        properties:
+          summary: { type: string }
+          risk_points:
+            type: array
+            items: { type: string }
+
+    - id: correlate_logs
+      description: Correlate runtime logs with failure
+      depends_on: [analyze_code]
+      prompt: |
+        Correlate the failure with runtime logs.
+
+        Identify:
+        - events before failure
+        - evidence supporting failure cause
+
+        Return JSON:
+        - evidence (array)
+
+      output_schema:
+        type: object
+        required: [evidence]
+        properties:
+          evidence:
+            type: array
+            items: { type: string }
+
+    - id: validate_hypothesis
+      description: Validate root cause hypothesis
+      depends_on: [correlate_logs]
+      prompt: |
+        Validate the hypothesis:
+
+        "The failure is caused by a null reference or invalid object access."
+
+        Check:
+        - consistency with code
+        - support from logs
+        - alternative explanations
+
+        Return JSON:
+        - valid (true/false)
+        - reasoning
+
+      output_schema:
+        type: object
+        required: [valid, reasoning]
+        properties:
+          valid: { type: boolean }
+          reasoning: { type: string }
+
+    - id: final_output
+      description: Produce final root cause analysis
+      depends_on: [validate_hypothesis]
+      condition: "steps.validate_hypothesis.valid == true"
+      prompt: |
+        Produce final root cause analysis.
+
+        Must include:
+        - root_cause
+        - hypothesis (cause, mechanism, trigger)
+        - fix_suggestion (concrete, Level B)
+        - confidence (0–1)
+
+        Return JSON only.
+
+      output_schema:
+        type: object
+        required:
+          - root_cause
+          - hypothesis
+          - fix_suggestion
+          - confidence
+        properties:
+          root_cause: { type: string }
+          hypothesis:
+            type: object
+            required: [cause, mechanism, trigger]
+            properties:
+              cause: { type: string }
+              mechanism: { type: string }
+              trigger: { type: string }
+          fix_suggestion: { type: string }
+          confidence: { type: number }
+
+  control_flow:
+    on_validation_failure:
+      step: validate_hypothesis
+      if: "valid == false"
+      action: retry
+      max_retries: 1
+      fallback: final_output
