@@ -20,52 +20,52 @@
 
 ## Table Stakes (must have or users won't trust the tool)
 
-| Feature | Why Expected | Complexity |
-|---------|--------------|------------|
-| Load artifact as folder or ZIP | Analysts have both on-disk runs and archives | Low |
-| Complete ERROR anomaly coverage — none missed | Missing any error = tool is untrustworthy | Low |
-| Group duplicate errors with occurrence count | Same error in a retry loop is noise without aggregation | Low |
-| Show which Gherkin step each error occurred in | Analysts think in steps, not log line numbers | Medium |
-| Phase classification (Precondition / TestCase / PostCondition) | A Precondition error means setup failed, not a product bug | Low |
-| Ranked list — earliest error labeled "Primary" | The cascade problem is the core pain; ranking without labeling is invisible | Low |
-| Error message + stack trace per anomaly | Analysts cannot evaluate without full context | Low |
-| Click-to-navigate to resolved source file | If tool says `WaitForTask:31`, analyst must be able to jump there | Medium |
-| Confidence score shown at same level as hypothesis | AI output without confidence indicator breeds mistrust | Low |
-| "Create GitLab Issue" with explicit review + confirmation | Auto-submit causes issue spam; analysts will disable the tool | Low |
-| GitLab issue pre-populated with all meaningful fields | Partial template defeats the purpose | Low |
-| Graceful degradation when Continue is unavailable | Tool must not go dark during Continue updates | Low |
-| Analysis progress feedback | Frozen UI during 10k-line parse is alarming | Low |
-| Distinct "parse failed" vs "no errors found" states | Silent failure is catastrophic for trust | Low |
+| Feature                                                        | Why Expected                                                                | Complexity |
+|----------------------------------------------------------------|-----------------------------------------------------------------------------|------------|
+| Load artifact as folder or ZIP                                 | Analysts have both on-disk runs and archives                                | Low        |
+| Complete ERROR anomaly coverage — none missed                  | Missing any error = tool is untrustworthy                                   | Low        |
+| Group duplicate errors with occurrence count                   | Same error in a retry loop is noise without aggregation                     | Low        |
+| Show which Gherkin step each error occurred in                 | Analysts think in steps, not log line numbers                               | Medium     |
+| Phase classification (Precondition / TestCase / PostCondition) | A Precondition error means setup failed, not a product bug                  | Low        |
+| Ranked list — earliest error labeled "Primary"                 | The cascade problem is the core pain; ranking without labeling is invisible | Low        |
+| Error message + stack trace per anomaly                        | Analysts cannot evaluate without full context                               | Low        |
+| Click-to-navigate to resolved source file                      | If tool says `WaitForTask:31`, analyst must be able to jump there           | Medium     |
+| Confidence score shown at same level as hypothesis             | AI output without confidence indicator breeds mistrust                      | Low        |
+| "Create GitLab Issue" with explicit review + confirmation      | Auto-submit causes issue spam; analysts will disable the tool               | Low        |
+| GitLab issue pre-populated with all meaningful fields          | Partial template defeats the purpose                                        | Low        |
+| Graceful degradation when Continue is unavailable              | Tool must not go dark during Continue updates                               | Low        |
+| Analysis progress feedback                                     | Frozen UI during 10k-line parse is alarming                                 | Low        |
+| Distinct "parse failed" vs "no errors found" states            | Silent failure is catastrophic for trust                                    | Low        |
 
 ## Differentiators (what would make this tool stand out)
 
-| Feature | Value Proposition | Complexity |
-|---------|-------------------|------------|
-| Phase-aware classification | No other VS Code tool maps log errors to Gherkin phases; analyst immediately knows if setup vs product failure | Medium |
-| "Secondary effect" labeling | Tells analyst which errors NOT to investigate — saves as much time as identifying the primary | Medium |
-| Structured hypothesis (cause / mechanism / trigger) | Falsifiable, actionable — analyst can agree/disagree with each part | Medium |
-| C# method body shown next to hypothesis | Analyst evaluates plausibility without leaving VS Code | Medium |
-| Secondary effects list in issue template | Reduces duplicate issue creation; developer sees the cascade | Low |
-| Phase 1 always runs independently of AI | High value even with Continue offline; uniquely reliable | Low |
-| Symbol resolution confidence shown explicitly | "exact class+method match (1.0)" vs "method name only (0.3)" signals how much to trust navigation | Low |
-| Batch run: multiple test cases in one load | Real runs contain several test cases; per-run analysis in one operation | Medium |
+| Feature                                             | Value Proposition                                                                                              | Complexity |
+|-----------------------------------------------------|----------------------------------------------------------------------------------------------------------------|------------|
+| Phase-aware classification                          | No other VS Code tool maps log errors to Gherkin phases; analyst immediately knows if setup vs product failure | Medium     |
+| "Secondary effect" labeling                         | Tells analyst which errors NOT to investigate — saves as much time as identifying the primary                  | Medium     |
+| Structured hypothesis (cause / mechanism / trigger) | Falsifiable, actionable — analyst can agree/disagree with each part                                            | Medium     |
+| C# method body shown next to hypothesis             | Analyst evaluates plausibility without leaving VS Code                                                         | Medium     |
+| Secondary effects list in issue template            | Reduces duplicate issue creation; developer sees the cascade                                                   | Low        |
+| Phase 1 always runs independently of AI             | High value even with Continue offline; uniquely reliable                                                       | Low        |
+| Symbol resolution confidence shown explicitly       | "exact class+method match (1.0)" vs "method name only (0.3)" signals how much to trust navigation              | Low        |
+| Batch run: multiple test cases in one load          | Real runs contain several test cases; per-run analysis in one operation                                        | Medium     |
 
 ## Anti-Features (things that would actively harm adoption)
 
-| Anti-Feature | Why Avoid | What to Do Instead |
-|--------------|-----------|-------------------|
-| Auto-submit GitLab issues | Creates issue spam; analysts lose trust and their team gets angry | Per-issue confirmation with preview, always |
-| "No errors found" when parsing silently fails | Analyst concludes run was clean — catastrophic misdiagnosis | Distinct "parse error" state with clear message |
-| Raw log line numbers as primary navigation | Line 3,241 means nothing; analysts need step name + class | Lead with step name and class; line number is secondary |
-| Sending full log or workspace to AI | Privacy risk + context overflow + confuses the model | Send method body only |
-| Aggregating errors across different steps | Same exception in step A and step B are different failures | Step name is part of aggregation key |
-| Confidence score hidden or buried | AI suggestion without visible confidence creates false certainty | Confidence always co-located with hypothesis |
-| Batch issue creation ("create all") | Bypasses review; creates noise | Per-issue confirmation only |
-| Only generic GitLab labels ("bug") | Analyst cannot filter auto-analyzed issues | Always apply `test-failure` + `automated-analysis` |
-| Requiring Continue for Phase 1 | Blocks core value during Continue downtime | Phase 1 must run independently |
-| Showing WARN-level lines as anomalies | This log format uses WARN for verbose adapter output; would flood the list | ERROR only |
-| Flat unranked anomaly list | Without ranking, analyst must do manually what the tool claims to do | Ranked list, "Primary" label required |
-| New editor tab per anomaly | Tab proliferation + wrong mental model (editor = source) | Single updating webview panel |
+| Anti-Feature                                  | Why Avoid                                                                  | What to Do Instead                                      |
+|-----------------------------------------------|----------------------------------------------------------------------------|---------------------------------------------------------|
+| Auto-submit GitLab issues                     | Creates issue spam; analysts lose trust and their team gets angry          | Per-issue confirmation with preview, always             |
+| "No errors found" when parsing silently fails | Analyst concludes run was clean — catastrophic misdiagnosis                | Distinct "parse error" state with clear message         |
+| Raw log line numbers as primary navigation    | Line 3,241 means nothing; analysts need step name + class                  | Lead with step name and class; line number is secondary |
+| Sending full log or workspace to AI           | Privacy risk + context overflow + confuses the model                       | Send method body only                                   |
+| Aggregating errors across different steps     | Same exception in step A and step B are different failures                 | Step name is part of aggregation key                    |
+| Confidence score hidden or buried             | AI suggestion without visible confidence creates false certainty           | Confidence always co-located with hypothesis            |
+| Batch issue creation ("create all")           | Bypasses review; creates noise                                             | Per-issue confirmation only                             |
+| Only generic GitLab labels ("bug")            | Analyst cannot filter auto-analyzed issues                                 | Always apply `test-failure` + `automated-analysis`      |
+| Requiring Continue for Phase 1                | Blocks core value during Continue downtime                                 | Phase 1 must run independently                          |
+| Showing WARN-level lines as anomalies         | This log format uses WARN for verbose adapter output; would flood the list | ERROR only                                              |
+| Flat unranked anomaly list                    | Without ranking, analyst must do manually what the tool claims to do       | Ranked list, "Primary" label required                   |
+| New editor tab per anomaly                    | Tab proliferation + wrong mental model (editor = source)                   | Single updating webview panel                           |
 
 ---
 

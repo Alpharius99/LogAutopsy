@@ -6,17 +6,17 @@
 
 ## Recommended Stack
 
-| Category | Choice | Version | Do NOT use |
-|----------|--------|---------|------------|
-| Language | TypeScript | ~5.4 | — |
-| VS Code engine floor | `@types/vscode` | `^1.90.0` | — |
-| Bundler | `esbuild` | `^0.21` | webpack |
-| Test runner | `@vscode/test-cli` + Mocha | `^0.0.9` / `^10` | `@vscode/test-electron`, Jest |
-| Gherkin parser | `@cucumber/gherkin` + `@cucumber/messages` | `^28` / `^24` | regex, `gherkin-parse` |
-| SHA-256 | `crypto` (Node.js built-in) | — | `js-sha256`, any npm hash lib |
-| HTTP (GitLab) | `fetch` (Node.js built-in) | — | `axios`, `node-fetch` |
-| Continue integration | `vscode.extensions.getExtension()` + exports | — | Direct HTTP to Continue server |
-| Packaging | `@vscode/vsce` | `^3` | old `vsce` package |
+| Category             | Choice                                       | Version          | Do NOT use                     |
+|----------------------|----------------------------------------------|------------------|--------------------------------|
+| Language             | TypeScript                                   | ~5.4             | —                              |
+| VS Code engine floor | `@types/vscode`                              | `^1.90.0`        | —                              |
+| Bundler              | `esbuild`                                    | `^0.21`          | webpack                        |
+| Test runner          | `@vscode/test-cli` + Mocha                   | `^0.0.9` / `^10` | `@vscode/test-electron`, Jest  |
+| Gherkin parser       | `@cucumber/gherkin` + `@cucumber/messages`   | `^28` / `^24`    | regex, `gherkin-parse`         |
+| SHA-256              | `crypto` (Node.js built-in)                  | —                | `js-sha256`, any npm hash lib  |
+| HTTP (GitLab)        | `fetch` (Node.js built-in)                   | —                | `axios`, `node-fetch`          |
+| Continue integration | `vscode.extensions.getExtension()` + exports | —                | Direct HTTP to Continue server |
+| Packaging            | `@vscode/vsce`                               | `^3`             | old `vsce` package             |
 
 ---
 
@@ -43,16 +43,16 @@ Node.js 20 LTS (bundled in VS Code 1.90+) exposes `fetch` globally. No `axios`, 
 
 All from the `vscode` built-in module — nothing to install:
 
-| API | Purpose |
-|-----|---------|
-| `vscode.window.createTreeView` + `TreeDataProvider<T>` | Sidebar anomaly list |
-| `vscode.window.createWebviewPanel` with `retainContextWhenHidden: true` | Results detail view |
-| `vscode.commands.executeCommand('vscode.executeWorkspaceSymbolProvider', query)` | C# symbol lookup — returns `SymbolInformation[]` |
-| `vscode.workspace.openTextDocument` + `TextDocument.getText(range)` | Method body extraction for Continue payload |
-| `vscode.workspace.fs` (NOT Node.js `fs`) | File discovery and log reading — required for remote/WSL workspaces |
-| `vscode.window.showOpenDialog` | Artifact folder picker |
-| `vscode.window.withProgress` | Progress notification during analysis |
-| `vscode.workspace.getConfiguration` | Extension settings (GitLab URL, PAT, Continue extension ID) |
+| API                                                                              | Purpose                                                             |
+|----------------------------------------------------------------------------------|---------------------------------------------------------------------|
+| `vscode.window.createTreeView` + `TreeDataProvider<T>`                           | Sidebar anomaly list                                                |
+| `vscode.window.createWebviewPanel` with `retainContextWhenHidden: true`          | Results detail view                                                 |
+| `vscode.commands.executeCommand('vscode.executeWorkspaceSymbolProvider', query)` | C# symbol lookup — returns `SymbolInformation[]`                    |
+| `vscode.workspace.openTextDocument` + `TextDocument.getText(range)`              | Method body extraction for Continue payload                         |
+| `vscode.workspace.fs` (NOT Node.js `fs`)                                         | File discovery and log reading — required for remote/WSL workspaces |
+| `vscode.window.showOpenDialog`                                                   | Artifact folder picker                                              |
+| `vscode.window.withProgress`                                                     | Progress notification during analysis                               |
+| `vscode.workspace.getConfiguration`                                              | Extension settings (GitLab URL, PAT, Continue extension ID)         |
 
 **Critical:** Use `vscode.workspace.fs` instead of Node.js `fs` for all file I/O. The `fs` module breaks in remote workspace scenarios (SSH, WSL, Dev Containers).
 
@@ -116,10 +116,10 @@ Use `activationEvents: ["onCommand:..."]` — never `"*"`. Eager activation pena
 
 ## Confidence Assessment
 
-| Area | Level | Reason |
-|------|-------|--------|
-| VS Code API (TreeView, Webview, workspace.fs, symbol provider) | HIGH | Stable, documented APIs unchanged since VS Code 1.74+ |
-| Toolchain (esbuild, `@vscode/test-cli`, `@vscode/vsce`) | HIGH | Official Microsoft tooling |
-| Gherkin parsing (`@cucumber/gherkin`) | HIGH | Official Cucumber project; v28 is current stable |
-| Node.js built-ins (crypto, fetch) | HIGH | Stable Node.js 18+/20 LTS APIs |
-| Continue integration | MEDIUM | Public API not formally versioned; verify at runtime |
+| Area                                                           | Level  | Reason                                                |
+|----------------------------------------------------------------|--------|-------------------------------------------------------|
+| VS Code API (TreeView, Webview, workspace.fs, symbol provider) | HIGH   | Stable, documented APIs unchanged since VS Code 1.74+ |
+| Toolchain (esbuild, `@vscode/test-cli`, `@vscode/vsce`)        | HIGH   | Official Microsoft tooling                            |
+| Gherkin parsing (`@cucumber/gherkin`)                          | HIGH   | Official Cucumber project; v28 is current stable      |
+| Node.js built-ins (crypto, fetch)                              | HIGH   | Stable Node.js 18+/20 LTS APIs                        |
+| Continue integration                                           | MEDIUM | Public API not formally versioned; verify at runtime  |

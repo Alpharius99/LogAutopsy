@@ -17,32 +17,32 @@ The key technical risks are: extension host blocking during log parsing, Continu
 
 ## Recommended Stack
 
-| Category | Choice | Notes |
-|----------|--------|-------|
-| Language | TypeScript ~5.4 | — |
-| VS Code engine floor | `^1.90.0` | Ensures `fetch` and `SecretStorage` available |
-| Bundler | `esbuild ^0.21` | Default in `yo code`; not webpack |
-| Test runner | `@vscode/test-cli` + Mocha | `@vscode/test-electron` is deprecated |
-| Gherkin parser | `@cucumber/gherkin ^28` + `@cucumber/messages ^24` | Typed AST; do not use regex |
-| Hashing | `crypto` (Node built-in) | No npm hash libraries |
-| HTTP (GitLab) | `fetch` (Node built-in) | No axios / node-fetch |
-| Continue integration | `vscode.extensions.getExtension()` exports | Not direct HTTP — verify API at runtime |
-| File I/O | `vscode.workspace.fs` | Not Node.js `fs` — required for remote/WSL |
-| Packaging | `@vscode/vsce ^3` | Not old `vsce` package |
+| Category             | Choice                                             | Notes                                         |
+|----------------------|----------------------------------------------------|-----------------------------------------------|
+| Language             | TypeScript ~5.4                                    | —                                             |
+| VS Code engine floor | `^1.90.0`                                          | Ensures `fetch` and `SecretStorage` available |
+| Bundler              | `esbuild ^0.21`                                    | Default in `yo code`; not webpack             |
+| Test runner          | `@vscode/test-cli` + Mocha                         | `@vscode/test-electron` is deprecated         |
+| Gherkin parser       | `@cucumber/gherkin ^28` + `@cucumber/messages ^24` | Typed AST; do not use regex                   |
+| Hashing              | `crypto` (Node built-in)                           | No npm hash libraries                         |
+| HTTP (GitLab)        | `fetch` (Node built-in)                            | No axios / node-fetch                         |
+| Continue integration | `vscode.extensions.getExtension()` exports         | Not direct HTTP — verify API at runtime       |
+| File I/O             | `vscode.workspace.fs`                              | Not Node.js `fs` — required for remote/WSL    |
+| Packaging            | `@vscode/vsce ^3`                                  | Not old `vsce` package                        |
 
 ---
 
 ## Build Order (7 Stages)
 
-| Stage | What | Rationale |
-|-------|------|-----------|
-| 1 | Scaffold: `package.json`, `activate()` stub, empty `TreeDataProvider`, `OutputChannel`, esbuild pipeline, CSP-correct webview skeleton | Validates dev loop; CSP and `activationEvents` must be correct from the start |
-| 2 | Phase 1 pipeline: `LogParser → FeatureParser → StepExtractor → AnomalyDetector → Aggregator` | Pure TypeScript, unit-testable without VS Code host; validate all regexes against `examples/` |
-| 3 | TreeView UI: wire "Run Analysis" command, anomaly hierarchy with "Primary" / "Secondary" labels | Requires Phase 1 data; first analyst-visible result |
-| 4 | `ResultsWebviewPanel`: HTML scaffold, `ready` handshake, anomaly detail render | Requires TreeView wiring; implement single-panel reuse and debounce here |
-| 5 | Symbol resolution + code navigation: `SymbolResolver`, `CodeExtractor`, `NullAiBackend` | Delivers click-to-source value with no AI dependency |
-| 6 | Continue integration: inspect `ext.exports` at runtime, implement `ContinueExtensionAdapter` | Highest risk — built last, behind `AiBackend` interface |
-| 7 | GitLab integration: `GitLabClient`, confirmation dialog, PAT via `SecretStorage` | Depends on full RCA output; `Private-Token` header, not `Authorization: Bearer` |
+| Stage | What                                                                                                                                   | Rationale                                                                                     |
+|-------|----------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------|
+| 1     | Scaffold: `package.json`, `activate()` stub, empty `TreeDataProvider`, `OutputChannel`, esbuild pipeline, CSP-correct webview skeleton | Validates dev loop; CSP and `activationEvents` must be correct from the start                 |
+| 2     | Phase 1 pipeline: `LogParser → FeatureParser → StepExtractor → AnomalyDetector → Aggregator`                                           | Pure TypeScript, unit-testable without VS Code host; validate all regexes against `examples/` |
+| 3     | TreeView UI: wire "Run Analysis" command, anomaly hierarchy with "Primary" / "Secondary" labels                                        | Requires Phase 1 data; first analyst-visible result                                           |
+| 4     | `ResultsWebviewPanel`: HTML scaffold, `ready` handshake, anomaly detail render                                                         | Requires TreeView wiring; implement single-panel reuse and debounce here                      |
+| 5     | Symbol resolution + code navigation: `SymbolResolver`, `CodeExtractor`, `NullAiBackend`                                                | Delivers click-to-source value with no AI dependency                                          |
+| 6     | Continue integration: inspect `ext.exports` at runtime, implement `ContinueExtensionAdapter`                                           | Highest risk — built last, behind `AiBackend` interface                                       |
+| 7     | GitLab integration: `GitLabClient`, confirmation dialog, PAT via `SecretStorage`                                                       | Depends on full RCA output; `Private-Token` header, not `Authorization: Bearer`               |
 
 ---
 
@@ -63,13 +63,13 @@ Missing any of these means analysts will not trust the tool:
 
 ## Top Pitfalls
 
-| Risk | Prevention (one line) |
-|------|-----------------------|
-| **Extension host blocking** (C2) — synchronous parse of 10k-line files freezes all of VS Code | `vscode.workspace.fs.readFile` async + process in 500-line chunks with `setImmediate` yields, from Stage 2 |
-| **Continue `exports` undefined before activate** (C1) — Phase 2 silently fails even when Continue is running | Always `await ext.activate()` before accessing `ext.exports`; duck-type the API; `NullAiBackend` fallback |
-| **Webview CSP violations** (C4) — results UI renders blank with no visible error, especially after VSIX install | Fresh nonce per render, `webview.cspSource` for styles, `webview.asWebviewUri()` for all assets, correct `localResourceRoots` |
-| **PAT in plaintext settings** (C5) — token lands in `settings.json`, synced to cloud, readable by other extensions | `context.secrets` (OS keychain) exclusively; expose `LogAutopsy: Set GitLab Token` command |
-| **GitLab wrong auth header** (C6) — `Authorization: Bearer` returns 401 silently confused with bad PAT | Use `Private-Token: <pat>` header; handle 429 explicitly; document `http.systemCertificates` for private GitLab |
+| Risk                                                                                                               | Prevention (one line)                                                                                                         |
+|--------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|
+| **Extension host blocking** (C2) — synchronous parse of 10k-line files freezes all of VS Code                      | `vscode.workspace.fs.readFile` async + process in 500-line chunks with `setImmediate` yields, from Stage 2                    |
+| **Continue `exports` undefined before activate** (C1) — Phase 2 silently fails even when Continue is running       | Always `await ext.activate()` before accessing `ext.exports`; duck-type the API; `NullAiBackend` fallback                     |
+| **Webview CSP violations** (C4) — results UI renders blank with no visible error, especially after VSIX install    | Fresh nonce per render, `webview.cspSource` for styles, `webview.asWebviewUri()` for all assets, correct `localResourceRoots` |
+| **PAT in plaintext settings** (C5) — token lands in `settings.json`, synced to cloud, readable by other extensions | `context.secrets` (OS keychain) exclusively; expose `LogAutopsy: Set GitLab Token` command                                    |
+| **GitLab wrong auth header** (C6) — `Authorization: Bearer` returns 401 silently confused with bad PAT             | Use `Private-Token: <pat>` header; handle 429 explicitly; document `http.systemCertificates` for private GitLab               |
 
 ---
 
@@ -101,14 +101,14 @@ Do not defer artifact validation to a later stage. Regex assumptions that look c
 
 ## Confidence Assessment
 
-| Area | Level | Notes |
-|------|-------|-------|
-| Stack | HIGH | Official Microsoft tooling throughout; VS Code APIs stable since 1.74+ |
-| Features / scope | HIGH | Spec + example artifacts give concrete domain grounding |
-| Architecture | HIGH | Extension host patterns, webview boundary, TreeView — all well-documented |
-| Pitfalls | HIGH | VS Code extension API surface is stable; all pitfalls are known failure modes |
-| Continue integration | MEDIUM | Public API not formally versioned; must be verified at runtime |
-| Message normalization | MEDIUM | Needs empirical data from `examples/` to tune correctly |
+| Area                  | Level  | Notes                                                                         |
+|-----------------------|--------|-------------------------------------------------------------------------------|
+| Stack                 | HIGH   | Official Microsoft tooling throughout; VS Code APIs stable since 1.74+        |
+| Features / scope      | HIGH   | Spec + example artifacts give concrete domain grounding                       |
+| Architecture          | HIGH   | Extension host patterns, webview boundary, TreeView — all well-documented     |
+| Pitfalls              | HIGH   | VS Code extension API surface is stable; all pitfalls are known failure modes |
+| Continue integration  | MEDIUM | Public API not formally versioned; must be verified at runtime                |
+| Message normalization | MEDIUM | Needs empirical data from `examples/` to tune correctly                       |
 
 Overall confidence: **HIGH for the deterministic pipeline; MEDIUM for Continue integration**.
 

@@ -4,7 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**LogAutopsy** is a VS Code extension that analyzes automated test artifacts (log4net log files + Gherkin `.feature` files) to identify root causes of test failures. The full implementation spec is in `docs/test_analysis_agent_spec_v2.md`.
+**LogAutopsy** is a VS Code extension that analyzes automated test artifacts 
+(log4net log files + Gherkin `.feature` files) to identify root causes of test failures. 
+The full implementation spec is in `docs/test_analysis_agent_spec_v2.md`.
 
 The extension is **not yet implemented** — this repo currently holds the spec and example artifacts.
 
@@ -22,12 +24,12 @@ Phase 2 (AI-assisted via Continue extension):
 
 ### VS Code Extension Components
 
-| Component | Technology | Role |
-|---|---|---|
-| **Sidebar** | VS Code TreeView | Load artifacts, trigger analysis, review results, create GitLab issues |
-| **Local Engine** | TypeScript (extension host) | Log parsing, anomaly detection, step extraction, aggregation |
-| **Continue** | Continue extension API | Root cause hypothesis generation (Phase 2 only) |
-| **GitLab Integration** | REST API + PAT | Manual issue creation (one per user confirmation) |
+| Component              | Technology                  | Role                                                                   |
+|------------------------|-----------------------------|------------------------------------------------------------------------|
+| **Sidebar**            | VS Code TreeView            | Load artifacts, trigger analysis, review results, create GitLab issues |
+| **Local Engine**       | TypeScript (extension host) | Log parsing, anomaly detection, step extraction, aggregation           |
+| **Continue**           | Continue extension API      | Root cause hypothesis generation (Phase 2 only)                        |
+| **GitLab Integration** | REST API + PAT              | Manual issue creation (one per user confirmation)                      |
 
 ## Artifact Structure
 
@@ -124,17 +126,17 @@ A VS Code extension for Test Analysts that automates the painful mechanical work
 ## Technology Stack
 
 ## Recommended Stack
-| Category | Choice | Version | Do NOT use |
-|----------|--------|---------|------------|
-| Language | TypeScript | ~5.4 | — |
-| VS Code engine floor | `@types/vscode` | `^1.90.0` | — |
-| Bundler | `esbuild` | `^0.21` | webpack |
-| Test runner | `@vscode/test-cli` + Mocha | `^0.0.9` / `^10` | `@vscode/test-electron`, Jest |
-| Gherkin parser | `@cucumber/gherkin` + `@cucumber/messages` | `^28` / `^24` | regex, `gherkin-parse` |
-| SHA-256 | `crypto` (Node.js built-in) | — | `js-sha256`, any npm hash lib |
-| HTTP (GitLab) | `fetch` (Node.js built-in) | — | `axios`, `node-fetch` |
-| Continue integration | `vscode.extensions.getExtension()` + exports | — | Direct HTTP to Continue server |
-| Packaging | `@vscode/vsce` | `^3` | old `vsce` package |
+| Category             | Choice                                       | Version          | Do NOT use                     |
+|----------------------|----------------------------------------------|------------------|--------------------------------|
+| Language             | TypeScript                                   | ~5.4             | —                              |
+| VS Code engine floor | `@types/vscode`                              | `^1.90.0`        | —                              |
+| Bundler              | `esbuild`                                    | `^0.21`          | webpack                        |
+| Test runner          | `@vscode/test-cli` + Mocha                   | `^0.0.9` / `^10` | `@vscode/test-electron`, Jest  |
+| Gherkin parser       | `@cucumber/gherkin` + `@cucumber/messages`   | `^28` / `^24`    | regex, `gherkin-parse`         |
+| SHA-256              | `crypto` (Node.js built-in)                  | —                | `js-sha256`, any npm hash lib  |
+| HTTP (GitLab)        | `fetch` (Node.js built-in)                   | —                | `axios`, `node-fetch`          |
+| Continue integration | `vscode.extensions.getExtension()` + exports | —                | Direct HTTP to Continue server |
+| Packaging            | `@vscode/vsce`                               | `^3`             | old `vsce` package             |
 ## Key Decisions
 ### Bundler: esbuild, not webpack
 ### Testing: `@vscode/test-cli` + Mocha
@@ -142,16 +144,16 @@ A VS Code extension for Test Analysts that automates the painful mechanical work
 ### SHA-256: Node.js built-in `crypto`
 ### GitLab REST: built-in `fetch`
 ## VS Code API Surface Required
-| API | Purpose |
-|-----|---------|
-| `vscode.window.createTreeView` + `TreeDataProvider<T>` | Sidebar anomaly list |
-| `vscode.window.createWebviewPanel` with `retainContextWhenHidden: true` | Results detail view |
-| `vscode.commands.executeCommand('vscode.executeWorkspaceSymbolProvider', query)` | C# symbol lookup — returns `SymbolInformation[]` |
-| `vscode.workspace.openTextDocument` + `TextDocument.getText(range)` | Method body extraction for Continue payload |
-| `vscode.workspace.fs` (NOT Node.js `fs`) | File discovery and log reading — required for remote/WSL workspaces |
-| `vscode.window.showOpenDialog` | Artifact folder picker |
-| `vscode.window.withProgress` | Progress notification during analysis |
-| `vscode.workspace.getConfiguration` | Extension settings (GitLab URL, PAT, Continue extension ID) |
+| API                                                                              | Purpose                                                             |
+|----------------------------------------------------------------------------------|---------------------------------------------------------------------|
+| `vscode.window.createTreeView` + `TreeDataProvider<T>`                           | Sidebar anomaly list                                                |
+| `vscode.window.createWebviewPanel` with `retainContextWhenHidden: true`          | Results detail view                                                 |
+| `vscode.commands.executeCommand('vscode.executeWorkspaceSymbolProvider', query)` | C# symbol lookup — returns `SymbolInformation[]`                    |
+| `vscode.workspace.openTextDocument` + `TextDocument.getText(range)`              | Method body extraction for Continue payload                         |
+| `vscode.workspace.fs` (NOT Node.js `fs`)                                         | File discovery and log reading — required for remote/WSL workspaces |
+| `vscode.window.showOpenDialog`                                                   | Artifact folder picker                                              |
+| `vscode.window.withProgress`                                                     | Progress notification during analysis                               |
+| `vscode.workspace.getConfiguration`                                              | Extension settings (GitLab URL, PAT, Continue extension ID)         |
 ## Continue Integration Pattern
 ## package.json Key Fields
 ## Open Questions
@@ -159,13 +161,13 @@ A VS Code extension for Test Analysts that automates the painful mechanical work
 - What is the exact Continue extension ID — `Continue.continue` or `continue-dev.continue`? Make it configurable.
 - Does the team need WSL/remote workspace support? If yes, `vscode.workspace.fs` is mandatory.
 ## Confidence Assessment
-| Area | Level | Reason |
-|------|-------|--------|
-| VS Code API (TreeView, Webview, workspace.fs, symbol provider) | HIGH | Stable, documented APIs unchanged since VS Code 1.74+ |
-| Toolchain (esbuild, `@vscode/test-cli`, `@vscode/vsce`) | HIGH | Official Microsoft tooling |
-| Gherkin parsing (`@cucumber/gherkin`) | HIGH | Official Cucumber project; v28 is current stable |
-| Node.js built-ins (crypto, fetch) | HIGH | Stable Node.js 18+/20 LTS APIs |
-| Continue integration | MEDIUM | Public API not formally versioned; verify at runtime |
+| Area                                                           | Level  | Reason                                                |
+|----------------------------------------------------------------|--------|-------------------------------------------------------|
+| VS Code API (TreeView, Webview, workspace.fs, symbol provider) | HIGH   | Stable, documented APIs unchanged since VS Code 1.74+ |
+| Toolchain (esbuild, `@vscode/test-cli`, `@vscode/vsce`)        | HIGH   | Official Microsoft tooling                            |
+| Gherkin parsing (`@cucumber/gherkin`)                          | HIGH   | Official Cucumber project; v28 is current stable      |
+| Node.js built-ins (crypto, fetch)                              | HIGH   | Stable Node.js 18+/20 LTS APIs                        |
+| Continue integration                                           | MEDIUM | Public API not formally versioned; verify at runtime  |
 <!-- GSD:stack-end -->
 
 <!-- GSD:conventions-start source:CONVENTIONS.md -->

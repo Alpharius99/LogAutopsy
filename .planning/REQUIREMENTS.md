@@ -69,24 +69,24 @@
 
 ## Traceability
 
-| REQ-ID | Phase | Status |
-|--------|-------|--------|
-| LOAD-01 | Phase 2 — Parsing Pipeline | Pending |
-| LOAD-02 | Phase 2 — Parsing Pipeline | Pending |
-| PARSE-01 | Phase 2 — Parsing Pipeline | Pending |
-| PARSE-02 | Phase 2 — Parsing Pipeline | Pending |
-| PARSE-03 | Phase 2 — Parsing Pipeline | Pending |
-| DETECT-01 | Phase 2 — Parsing Pipeline | Pending |
-| DETECT-02 | Phase 2 — Parsing Pipeline | Pending |
-| DETECT-03 | Phase 2 — Parsing Pipeline | Pending |
-| RESULTS-01 | Phase 3 — Results UI | Pending |
-| RESULTS-02 | Phase 3 — Results UI | Pending |
-| RESULTS-03 | Phase 3 — Results UI | Pending |
-| DETAIL-01 | Phase 3 — Results UI | Pending |
-| AI-01 | Phase 4 — Symbol Resolution | Pending |
-| AI-03 | Phase 4 — Symbol Resolution | Pending |
-| AI-02 | Phase 5 — Continue Integration | Pending |
-| DETAIL-02 | Phase 5 — Continue Integration | Pending |
-| DETAIL-03 | Phase 5 — Continue Integration | Pending |
-| GITLAB-01 | Phase 6 — GitLab Content | Pending |
-| GITLAB-02 | Phase 6 — GitLab Content | Pending |
+| REQ-ID     | Phase                          | Status  |
+|------------|--------------------------------|---------|
+| LOAD-01    | Phase 2 — Parsing Pipeline     | Pending |
+| LOAD-02    | Phase 2 — Parsing Pipeline     | Pending |
+| PARSE-01   | Phase 2 — Parsing Pipeline     | Pending |
+| PARSE-02   | Phase 2 — Parsing Pipeline     | Pending |
+| PARSE-03   | Phase 2 — Parsing Pipeline     | Pending |
+| DETECT-01  | Phase 2 — Parsing Pipeline     | Pending |
+| DETECT-02  | Phase 2 — Parsing Pipeline     | Pending |
+| DETECT-03  | Phase 2 — Parsing Pipeline     | Pending |
+| RESULTS-01 | Phase 3 — Results UI           | Pending |
+| RESULTS-02 | Phase 3 — Results UI           | Pending |
+| RESULTS-03 | Phase 3 — Results UI           | Pending |
+| DETAIL-01  | Phase 3 — Results UI           | Pending |
+| AI-01      | Phase 4 — Symbol Resolution    | Pending |
+| AI-03      | Phase 4 — Symbol Resolution    | Pending |
+| AI-02      | Phase 5 — Continue Integration | Pending |
+| DETAIL-02  | Phase 5 — Continue Integration | Pending |
+| DETAIL-03  | Phase 5 — Continue Integration | Pending |
+| GITLAB-01  | Phase 6 — GitLab Content       | Pending |
+| GITLAB-02  | Phase 6 — GitLab Content       | Pending |

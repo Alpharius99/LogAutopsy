@@ -72,14 +72,14 @@ Given a failed test run, produce a ranked root cause diagnosis with a fix sugges
 
 ## Key Decisions
 
-| Decision | Rationale | Outcome |
-|----------|-----------|---------|
-| Continue as AI backend (not direct API) | Teams already have Continue deployed; avoids new dependencies | — Pending |
-| Only ERROR level triggers anomalies | WARN lines are noise in this log format; all exceptions use ERROR | — Pending |
-| Earliest anomaly = primary root cause | Cascade effects appear later; primary is the first thing that went wrong | — Pending |
-| Read-only code access | Safety constraint — extension never modifies production source files | — Pending |
-| GitLab issue creation is manual/confirmed | Prevents accidental issue flood; analyst reviews before submitting | — Pending |
-| Stateless per run | Simplifies implementation; log files are the source of truth | — Pending |
+| Decision                                  | Rationale                                                                | Outcome   |
+|-------------------------------------------|--------------------------------------------------------------------------|-----------|
+| Continue as AI backend (not direct API)   | Teams already have Continue deployed; avoids new dependencies            | — Pending |
+| Only ERROR level triggers anomalies       | WARN lines are noise in this log format; all exceptions use ERROR        | — Pending |
+| Earliest anomaly = primary root cause     | Cascade effects appear later; primary is the first thing that went wrong | — Pending |
+| Read-only code access                     | Safety constraint — extension never modifies production source files     | — Pending |
+| GitLab issue creation is manual/confirmed | Prevents accidental issue flood; analyst reviews before submitting       | — Pending |
+| Stateless per run                         | Simplifies implementation; log files are the source of truth             | — Pending |
 
 ## Evolution
 

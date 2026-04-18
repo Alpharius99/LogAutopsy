@@ -1,0 +1,61 @@
+[Begin of 250703_135240_Precondition log file]
+2025-07-03 13:52:40,680 [14] DEBUG GherkinExecutor\ExecuteStep:187 - Next test step 'StartCarBusTrace' (location '9:4', keyword 'When ', keyword type 'Action', argument '').
+2025-07-03 13:52:40,683 [14] DEBUG GherkinExecutor\GetTestStep:240 - Gherkin keyword is 'When' (type 'Action')
+2025-07-03 13:52:40,690 [14] DEBUG GherkinExecutor\ExecuteStep:217 - Got test step: 'StartCarBusTrace'.
+2025-07-03 13:52:40,695 [14] DEBUG AdapterXil\ActivateSimulation:149 - Activate simulation.
+2025-07-03 13:52:41,220 [14] ERROR AdapterXil.WebApiCalls|MethodException in WaitForTask:31 - Failed with the message 'width=device-width, initial-scale=1'.
+2025-07-03 13:52:41,243 [14] DEBUG AdapterXil.WebApiCalls\CheckServerAlive:59 - Checking, if the XIL API server is alive...
+2025-07-03 13:52:41,477 [14] ERROR AdapterXil.WebApiCalls|MethodException in WaitForTask:31 - Failed with the message 'width=device-width, initial-scale=1'.
+2025-07-03 13:52:41,493 [14] DEBUG AdapterXil.WebApiCalls\CheckServerAlive:67 - Something wrong with the server.
+2025-07-03 13:52:41,495 [14] DEBUG AdapterXil\Start:438 - This adapter is not running yet. It will be started now.
+2025-07-03 13:52:41,502 [14] DEBUG AdapterXil.WebApi\StartXiLWebApi:44 - The XIL Web API is already running.
+2025-07-03 13:52:41,504 [14] INFO  AdapterXil.WebApiCalls\CreateMockedConnection:96 - Connection 'Vector' (develop mode active) is being created...
+2025-07-03 13:52:41,725 [14] ERROR AdapterXil.WebApiCalls|MethodException in WaitForTask:31 - Failed with the message 'width=device-width, initial-scale=1'.
+2025-07-03 13:52:41,742 [14] WARN  KeywordTranslator\ExecuteTestStep:51 - The test action 'StartCarBusTrace' is failed.
+2025-07-03 13:52:41,744 [14] DEBUG GherkinExecutor\ExecuteStep:221 - Result of test step 'TestRunError'.
+2025-07-03 13:52:41,746 [14] DEBUG GherkinExecutor\ExecuteScenario:172 - Test step result after re-evaluation is 'TestRunError'.
+2025-07-03 13:52:41,748 [14] DEBUG GherkinExecutor\ExecuteStep:187 - Next test step 'UnlockCentralLockingSystem' (location '9:5', keyword 'And ', keyword type 'Conjunction', argument '').
+2025-07-03 13:52:41,750 [14] DEBUG GherkinExecutor\GetTestStep:240 - Gherkin keyword is 'And' (type 'Conjunction')
+2025-07-03 13:52:41,754 [14] DEBUG GherkinExecutor\ExecuteStep:217 - Got test step: 'UnlockCentralLockingSystem'.
+2025-07-03 13:52:41,757 [14] DEBUG ConnectorFacade.CentralLockingSystem\UnlockCentralLockingSystem:59 - Unlocking the central lock system...
+2025-07-03 13:52:41,759 [14] DEBUG RestBusStimulator\ChangeSwitchState:15 - Changing switch state 'IORemoteControlOpen' to 'open'...
+2025-07-03 13:52:41,761 [14] DEBUG RestBusStimulator\ChangeSwitchState:19 - Change non resettable switch state of 'IORemoteControlOpen' to 'press'/'release'.
+2025-07-03 13:52:41,797 [14] DEBUG AdapterXil\SetSignalStringValue:412 - Setting value of signal 'IORemoteControlOpen' to 'press'...
+2025-07-03 13:52:42,027 [14] ERROR AdapterXil.WebApiCalls|MethodException in WaitForTask:31 - Failed with the message 'width=device-width, initial-scale=1'.
+2025-07-03 13:52:42,043 [14] DEBUG AdapterXil.WebApiCalls\CheckServerAlive:59 - Checking, if the XIL API server is alive...
+2025-07-03 13:52:42,256 [14] ERROR AdapterXil.WebApiCalls|MethodException in WaitForTask:31 - Failed with the message 'width=device-width, initial-scale=1'.
+2025-07-03 13:52:42,274 [14] DEBUG AdapterXil.WebApiCalls\CheckServerAlive:67 - Something wrong with the server.
+2025-07-03 13:52:42,276 [14] DEBUG AdapterXil\Start:438 - This adapter is not running yet. It will be started now.
+2025-07-03 13:52:42,282 [14] DEBUG AdapterXil.WebApi\StartXiLWebApi:44 - The XIL Web API is already running.
+2025-07-03 13:52:42,284 [14] INFO  AdapterXil.WebApiCalls\CreateMockedConnection:96 - Connection 'dSPACE' (develop mode active) is being created...
+2025-07-03 13:52:42,495 [14] ERROR AdapterXil.WebApiCalls|MethodException in WaitForTask:31 - Failed with the message 'width=device-width, initial-scale=1'.
+2025-07-03 13:52:42,510 [14] WARN  KeywordTranslator\ExecuteTestStep:51 - The test action 'UnlockCentralLockingSystem' is failed.
+2025-07-03 13:52:42,513 [14] DEBUG GherkinExecutor\ExecuteStep:221 - Result of test step 'TestRunError'.
+2025-07-03 13:52:42,515 [14] DEBUG GherkinExecutor\ExecuteScenario:172 - Test step result after re-evaluation is 'TestRunError'.
+2025-07-03 13:52:42,517 [14] DEBUG GherkinExecutor\ExecuteStep:187 - Next test step 'CarEntry' (location '9:6', keyword 'And ', keyword type 'Conjunction', argument '').
+2025-07-03 13:52:42,518 [14] DEBUG GherkinExecutor\GetTestStep:240 - Gherkin keyword is 'And' (type 'Conjunction')
+2025-07-03 13:52:42,520 [14] DEBUG GherkinExecutor\ExecuteStep:217 - Got test step: 'CarEntry'.
+2025-07-03 13:52:42,523 [14] DEBUG RestBusStimulator\ChangeSwitchState:15 - Changing switch state 'IODriverDoorOpen' to 'open'...
+2025-07-03 13:52:42,525 [14] DEBUG RestBusStimulator\ChangeSwitchState:19 - Change non resettable switch state of 'IODriverDoorOpen' to 'press'/'release'.
+2025-07-03 13:52:42,526 [14] DEBUG AdapterXil\SetSignalStringValue:412 - Setting value of signal 'IODriverDoorOpen' to 'press'...
+2025-07-03 13:52:42,741 [14] ERROR AdapterXil.WebApiCalls|MethodException in WaitForTask:31 - Failed with the message 'width=device-width, initial-scale=1'.
+2025-07-03 13:52:42,758 [14] DEBUG AdapterXil.WebApiCalls\CheckServerAlive:59 - Checking, if the XIL API server is alive...
+2025-07-03 13:52:42,980 [14] ERROR AdapterXil.WebApiCalls|MethodException in WaitForTask:31 - Failed with the message 'width=device-width, initial-scale=1'.
+2025-07-03 13:52:42,998 [14] DEBUG AdapterXil.WebApiCalls\CheckServerAlive:67 - Something wrong with the server.
+2025-07-03 13:52:43,001 [14] DEBUG AdapterXil\Start:438 - This adapter is not running yet. It will be started now.
+2025-07-03 13:52:43,007 [14] DEBUG AdapterXil.WebApi\StartXiLWebApi:44 - The XIL Web API is already running.
+2025-07-03 13:52:43,009 [14] INFO  AdapterXil.WebApiCalls\CreateMockedConnection:96 - Connection 'dSPACE' (develop mode active) is being created...
+2025-07-03 13:52:43,228 [14] ERROR AdapterXil.WebApiCalls|MethodException in WaitForTask:31 - Failed with the message 'width=device-width, initial-scale=1'.
+2025-07-03 13:52:43,263 [14] WARN  KeywordTranslator\ExecuteTestStep:51 - The test action 'CarEntry' is failed.
+2025-07-03 13:52:43,266 [14] DEBUG GherkinExecutor\ExecuteStep:221 - Result of test step 'TestRunError'.
+2025-07-03 13:52:43,267 [14] DEBUG GherkinExecutor\ExecuteScenario:172 - Test step result after re-evaluation is 'TestRunError'.
+2025-07-03 13:52:43,269 [14] DEBUG GherkinExecutor\ExecuteStep:187 - Next test step 'TurnOnClamp15' (location '9:7', keyword 'And ', keyword type 'Conjunction', argument '').
+2025-07-03 13:52:43,271 [14] DEBUG GherkinExecutor\GetTestStep:240 - Gherkin keyword is 'And' (type 'Conjunction')
+2025-07-03 13:52:43,273 [14] DEBUG GherkinExecutor\ExecuteStep:217 - Got test step: 'TurnOnClamp15'.
+2025-07-03 13:52:43,393 [14] DEBUG AdapterXil\IsValueOfSignalEquals:235 - Checking, if the value of the signal 'K_CAN.Klemmen_Status_01.ZAS_Kl_15' equals to 'ein'...
+2025-07-03 13:52:43,395 [14] DEBUG AdapterXil\IsValueOfSignalEquals:241 - The adapter is in DevelopMode. This method returns true.
+2025-07-03 13:52:43,400 [14] DEBUG ObserverCarBus\WaitForCanSignalValueEqualsExpected:112 - The signal 'K_CAN.Klemmen_Status_01.ZAS_Kl_15' got finally the value 'ein'.
+2025-07-03 13:52:43,403 [14] INFO  ConnectorFacade.Macros\SafeSetSignalValue:40 - The signal 'K_CAN.Klemmen_Status_01.ZAS_Kl_15' is already 'ein'.
+2025-07-03 13:52:43,405 [14] DEBUG GherkinExecutor\ExecuteStep:221 - Result of test step 'Pass'.
+2025-07-03 13:52:43,406 [14] DEBUG GherkinExecutor\ExecuteScenario:172 - Test step result after re-evaluation is 'TestRunError'.
+[End of 250703_135240_Precondition log file]

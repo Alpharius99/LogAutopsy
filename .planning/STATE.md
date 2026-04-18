@@ -27,7 +27,7 @@ Progress: [░░░░░░░░░░] 0%
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| — | — | — | — |
+| —     | —     | —     | —        |
 
 **Recent Trend:**
 - Last 5 plans: —
@@ -56,13 +56,13 @@ None yet.
 
 ## Deferred Items
 
-| Category | Item | Status | Deferred At |
-|----------|------|--------|-------------|
-| v2 | ZIP archive loading | Deferred | Roadmap |
-| v2 | GitLab REST API issue creation | Deferred | Roadmap |
-| v2 | Click-to-navigate (source file at line) | Deferred | Roadmap |
-| v2 | Occurrence count in sidebar | Deferred | Roadmap |
-| v2 | Aggregation key normalization | Deferred | Roadmap |
+| Category | Item                                    | Status   | Deferred At |
+|----------|-----------------------------------------|----------|-------------|
+| v2       | ZIP archive loading                     | Deferred | Roadmap     |
+| v2       | GitLab REST API issue creation          | Deferred | Roadmap     |
+| v2       | Click-to-navigate (source file at line) | Deferred | Roadmap     |
+| v2       | Occurrence count in sidebar             | Deferred | Roadmap     |
+| v2       | Aggregation key normalization           | Deferred | Roadmap     |
 
 ## Session Continuity
 

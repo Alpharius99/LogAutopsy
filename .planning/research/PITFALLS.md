@@ -245,23 +245,23 @@ Calling `panel.webview.postMessage(data)` immediately after setting `panel.webvi
 
 ## Phase-Specific Summary
 
-| Phase | Pitfall | Mitigation |
-|-------|---------|------------|
-| Stage 1 scaffold | Missing `onView` in `activationEvents` | Declare explicitly; test installed VSIX |
-| Stage 1 scaffold | `out/` omitted from VSIX | Run `vsce ls`; use esbuild bundle |
-| Stage 1 scaffold | `fetch` / `SecretStorage` unavailable on old VS Code | Pin `engines.vscode >= 1.73.0` |
-| Stage 1 UI | CSP violations blank the webview | Nonce per render; `webview.cspSource`; `localResourceRoots` |
-| Stage 2 parsing | Extension host blocking | Async read + chunked processing with `setImmediate` yields |
-| Stage 2 parsing | Regex backtracking | Profile against worst-case samples in `examples/` |
-| Stage 4 UI | `postMessage` dropped before script ready | Implement `ready` handshake |
-| Stage 4 UI | Multiple panels on rapid selection | Debounce + reuse single panel instance |
-| Stage 5 symbols | Empty results when C# server still indexing | Retry with 2s backoff, 3 attempts |
-| Stage 5 symbols | Dotted class names return zero results | Strip namespace; query simple class name only |
-| Stage 5 symbols | Stale line numbers after file edit | Re-open via `openTextDocument` at resolution time |
-| Stage 6 Continue | `exports` undefined before `activate()` | Await `activate()`; duck-type exports |
-| Stage 6 Continue | Continue not installed — null dereference | Guard `getExtension` result; show install prompt |
-| Stage 7 GitLab | PAT in plaintext `settings.json` | `context.secrets` exclusively |
-| Stage 7 GitLab | Wrong auth header | Use `Private-Token` header |
-| Stage 7 GitLab | TLS failure on private GitLab | Document `http.systemCertificates`; never disable TLS globally |
-| Stage 7 GitLab | Rate limit 429 swallowed | Explicit 429 handling with user-visible message |
-| All stages | Flaky integration tests | `readyPromise` sentinel; fixture workspace; Mocha `retries: 2` |
+| Phase            | Pitfall                                              | Mitigation                                                     |
+|------------------|------------------------------------------------------|----------------------------------------------------------------|
+| Stage 1 scaffold | Missing `onView` in `activationEvents`               | Declare explicitly; test installed VSIX                        |
+| Stage 1 scaffold | `out/` omitted from VSIX                             | Run `vsce ls`; use esbuild bundle                              |
+| Stage 1 scaffold | `fetch` / `SecretStorage` unavailable on old VS Code | Pin `engines.vscode >= 1.73.0`                                 |
+| Stage 1 UI       | CSP violations blank the webview                     | Nonce per render; `webview.cspSource`; `localResourceRoots`    |
+| Stage 2 parsing  | Extension host blocking                              | Async read + chunked processing with `setImmediate` yields     |
+| Stage 2 parsing  | Regex backtracking                                   | Profile against worst-case samples in `examples/`              |
+| Stage 4 UI       | `postMessage` dropped before script ready            | Implement `ready` handshake                                    |
+| Stage 4 UI       | Multiple panels on rapid selection                   | Debounce + reuse single panel instance                         |
+| Stage 5 symbols  | Empty results when C# server still indexing          | Retry with 2s backoff, 3 attempts                              |
+| Stage 5 symbols  | Dotted class names return zero results               | Strip namespace; query simple class name only                  |
+| Stage 5 symbols  | Stale line numbers after file edit                   | Re-open via `openTextDocument` at resolution time              |
+| Stage 6 Continue | `exports` undefined before `activate()`              | Await `activate()`; duck-type exports                          |
+| Stage 6 Continue | Continue not installed — null dereference            | Guard `getExtension` result; show install prompt               |
+| Stage 7 GitLab   | PAT in plaintext `settings.json`                     | `context.secrets` exclusively                                  |
+| Stage 7 GitLab   | Wrong auth header                                    | Use `Private-Token` header                                     |
+| Stage 7 GitLab   | TLS failure on private GitLab                        | Document `http.systemCertificates`; never disable TLS globally |
+| Stage 7 GitLab   | Rate limit 429 swallowed                             | Explicit 429 handling with user-visible message                |
+| All stages       | Flaky integration tests                              | `readyPromise` sentinel; fixture workspace; Mocha `retries: 2` |

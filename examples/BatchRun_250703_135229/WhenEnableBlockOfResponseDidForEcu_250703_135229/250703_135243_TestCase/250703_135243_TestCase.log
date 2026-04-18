@@ -1,0 +1,26 @@
+[Begin of 250703_135243_TestCase log file]
+2025-07-03 13:52:43,415 [14] DEBUG GherkinExecutor\ExecuteStep:187 - Next test step 'enable block of response IVD-C for Clima ECU' (location '9:10', keyword 'When ', keyword type 'Action', argument '').
+2025-07-03 13:52:43,417 [14] DEBUG GherkinExecutor\GetTestStep:240 - Gherkin keyword is 'When' (type 'Action')
+2025-07-03 13:52:43,423 [14] DEBUG GherkinExecutor\ExecuteStep:217 - Got test step: 'enable block of response IVD-C for Clima ECU'.
+2025-07-03 13:52:43,425 [14] INFO  ConnectorFacade.CanManipulation\EnableBlockOfResponseDidForEcu:42 - Enable blocking of response 'IVD-C' for ecu 'Clima'.
+2025-07-03 13:52:43,428 [14] INFO  CanManipulator\EnableBlockOfResponseDidForEcu:54 - Enable block of response 'System.Byte[]' for ECU'Clima' ECU...
+2025-07-03 13:52:43,434 [14] DEBUG AdapterXil\SetSignalNumericValue:390 - Setting value of signal 'GUI/canId_A' to '474088006'...
+2025-07-03 13:52:43,651 [14] ERROR AdapterXil.WebApiCalls|MethodException in WaitForTask:31 - Failed with the message 'width=device-width, initial-scale=1'.
+2025-07-03 13:52:43,667 [14] DEBUG AdapterXil.WebApiCalls\CheckServerAlive:59 - Checking, if the XIL API server is alive...
+2025-07-03 13:52:43,943 [14] ERROR AdapterXil.WebApiCalls|MethodException in WaitForTask:31 - Failed with the message 'width=device-width, initial-scale=1'.
+2025-07-03 13:52:43,958 [14] DEBUG AdapterXil.WebApiCalls\CheckServerAlive:67 - Something wrong with the server.
+2025-07-03 13:52:43,960 [14] DEBUG AdapterXil\Start:438 - This adapter is not running yet. It will be started now.
+2025-07-03 13:52:43,966 [14] DEBUG AdapterXil.WebApi\StartXiLWebApi:44 - The XIL Web API is already running.
+2025-07-03 13:52:43,967 [14] INFO  AdapterXil.WebApiCalls\CreateMockedConnection:96 - Connection 'CanManipulation' (develop mode active) is being created...
+2025-07-03 13:52:44,185 [14] ERROR AdapterXil.WebApiCalls|MethodException in WaitForTask:31 - Failed with the message 'width=device-width, initial-scale=1'.
+2025-07-03 13:52:44,224 [14] WARN  KeywordTranslator\ExecuteTestStep:51 - The test action 'enable block of response IVD-C for Clima ECU' is failed.
+2025-07-03 13:52:44,227 [14] DEBUG GherkinExecutor\ExecuteStep:221 - Result of test step 'TestRunError'.
+2025-07-03 13:52:44,229 [14] DEBUG GherkinExecutor\ExecuteScenario:172 - Test step result after re-evaluation is 'TestRunError'.
+2025-07-03 13:52:44,231 [14] DEBUG GherkinExecutor\ExecuteStep:187 - Next test step 'response to request IVD-C is not sent for Clima ECU' (location '9:11', keyword 'Then ', keyword type 'Outcome', argument '').
+2025-07-03 13:52:44,233 [14] DEBUG GherkinExecutor\GetTestStep:240 - Gherkin keyword is 'Then' (type 'Outcome')
+2025-07-03 13:52:44,236 [14] DEBUG GherkinExecutor\ExecuteStep:217 - Got test step: 'response to request IVD-C is not sent for Clima ECU'.
+2025-07-03 13:52:44,238 [14] DEBUG ConnectorFacade.ExecuteChecks\ExecuteCheck:9 - Executing check 'SKyBT.Automation.TestContainer.TestScriptClasses.TestChecks.TestCheckDidResponseIsNotSent'.
+2025-07-03 13:52:44,251 [14] WARN  KeywordTranslator\ExecuteTestStep:34 - The test check 'response to request IVD-C is not sent for Clima ECU' is failed.
+2025-07-03 13:52:44,253 [14] DEBUG GherkinExecutor\ExecuteStep:221 - Result of test step 'TestRunError'.
+2025-07-03 13:52:44,255 [14] DEBUG GherkinExecutor\ExecuteScenario:172 - Test step result after re-evaluation is 'TestRunError'.
+[End of 250703_135243_TestCase log file]

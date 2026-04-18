@@ -1,0 +1,488 @@
+<html>
+<!-- Render head -->
+<head>
+	<meta content="text/html; charset=UTF-8" />	<title>ORU Test automation</title>
+	<style>body {
+    background-color: rgb(255, 255, 255);
+    font-family: arial, verdana, trebuchet, officina, sans-serif;
+}
+
+a {
+    text-decoration: none;
+}
+
+.HeadingTable,
+.SubHeadingTable,
+.GroupHeadingTable,
+.GroupEndTable {
+    border-width: 0;
+    border-style: solid;
+    border-color: rgb(150, 150, 150);
+}
+
+.ResultBlockHeading {
+    border-width: 1px;
+    border-style: solid;
+    border-color: rgb(150, 150, 150);
+}
+
+table.ResultTable,
+table.OverviewTable,
+table.CheckStatisticsTable {
+    margin-bottom: 0;
+    vertical-align: top;
+    border: 0;
+    border-spacing: 1px;
+}
+
+.HeadingTable {
+    width: 100%;
+    text-align: center;
+    margin: 15px auto 30px;
+    background-color: rgb(220, 221, 222);
+}
+
+.SubHeadingTable {
+    width: 100%;
+    text-align: center;
+    margin-top: 15px;
+    margin-bottom: 25px;
+    background-color: rgb(220, 221, 222);
+}
+
+.FullWidthTable {
+    width: 100%;
+}
+
+.GroupHeadingTable,
+.GroupEndTable {
+    width: 100%;
+    text-align: center;
+    margin-top: 15px;
+    padding-right: 0;
+    background-color: rgb(220, 221, 222);
+}
+
+.DefaultTable {
+    padding: 3px;
+    border-spacing: 3px;
+}
+
+.CheckStatisticsTable {
+    margin-bottom: 8px;
+    padding-right: 0;
+}
+
+.OverviewTable {
+    text-align: left;
+}
+
+td.CaptionCellDefault {
+    padding: 5px;
+    text-wrap: nowrap;
+    border-spacing: 0;
+    text-align: left;
+    font-weight: bold;
+    background-color: rgb(225, 225, 225);
+}
+
+td.NoAccentCell {
+    background-color: rgb(255, 255, 255);
+}
+
+td.TinyAccentCell {
+    background-color: rgb(245, 245, 245);
+}
+
+td.LowAccentCell {
+    background-color: rgb(225, 225, 225);
+}
+
+td.MidAccentCell {
+    background-color: rgb(175, 175, 175);
+}
+
+td.QueryCell {
+    text-wrap: nowrap;
+}
+
+table.ScreenOnly,
+a.Undecorated,
+.LinkCell {
+    display: none;
+}
+
+a.Undecorated:hover {
+    color: red;
+}
+
+a.Undecorated {
+    text-decoration: none;
+}
+
+.NavStyle {
+    background-color: rgb(220, 221, 222);
+}
+
+.NoMarginBottom {
+    margin-bottom: 0;
+}
+
+.DefaultTableBackground
+{
+    background-color: lightgray;
+}
+
+.CellNoColor {
+    text-align: left;
+    vertical-align: top;
+}
+
+.DefaultCell {
+    font-weight: normal;
+}
+
+.DefaultCellBold {
+    font-weight: bold;
+}
+
+.NegativeResult {
+    color: rgb(240, 0, 0);
+}
+
+.PositiveResult {
+    color: rgb(25, 165, 88);
+}
+
+.NoneResult {
+    color: rgb(105, 105, 105);
+}
+
+.InconclusiveResult {
+    color: rgb(255, 165, 0);
+}
+
+.ErrorResult {
+    color: rgb(205, 0, 0);
+}
+
+.NegativeResult,
+.PositiveResult,
+.NoneResult,
+.InconclusiveResult,
+.ErrorResult,
+.ColorlessResult {
+    padding: 5px 0 5px 5px;
+    border-spacing: 0;
+    text-align: right;
+}
+
+.Heading1,
+.Heading2,
+.Heading3,
+.Heading4 {
+    font-family: arial, sans-serif;
+    font-weight: bold;
+}
+
+.Heading1 {
+    font-size: 26px;
+}
+
+.Heading2 {
+    font-size: 20px;
+}
+
+.Heading3 {
+    font-size: 18px;
+    margin-bottom: 20px;
+    margin-top: 20px;
+}
+
+.Heading4 {
+    font-size: 16px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+img {
+    margin-bottom: 10px;
+    margin-right: 10px;
+}
+
+p {
+    margin-bottom: 20px;
+}
+
+.Indentation {
+    margin-left: 20px;
+}</style>
+
+<!-- Render body -->
+<body>
+<table class="HeadingTable">
+	<tr>
+	<td><div class="Heading1">Report ORU Test automation</div></td>
+
+</tr>
+
+</table><table class="SubHeadingTable">
+	<tr>
+	<td><div class="Heading2">Test campaign When enable block of response <Did> for <EcuName> ECU</div></td>
+
+</tr>
+
+</table><table class="DefaultTable">
+	<tr>
+	<td class="DefaultCellBold">Test started at</td>
+	<td class="DefaultCell">2025-07-03 13:52:40</td>
+
+</tr>
+	<tr>
+	<td class="DefaultCellBold">Test finished at</td>
+	<td class="DefaultCell">2025-07-03 13:52:46</td>
+
+</tr>
+	<tr>
+	<td class="DefaultCellBold">Test campaign duration</td>
+	<td class="DefaultCell">5 second</td>
+
+</tr>
+
+</table><table class="OverviewTable">
+	<tr>
+	<td class="CaptionCellDefault">Overall test cases</td>
+	<td class="ColorlessResult">3</td>
+	<td class="ColorlessResult"></td>
+
+</tr>
+
+</table><table class="ResultTable">
+	<tr>
+	<td class="CaptionCellDefault">Begin</td>
+	<td class="TinyAccentCell">03.07.2025 13:52:40</td>
+
+</tr>
+	<tr>
+	<td class="CaptionCellDefault">End</td>
+	<td class="TinyAccentCell">03.07.2025 13:52:46</td>
+
+</tr>
+	<tr>
+	<td class="CaptionCellDefault">Test duration</td>
+	<td class="TinyAccentCell">5 second</td>
+
+</tr>
+	<tr>
+	<td class="CaptionCellDefault">Name</td>
+	<td class="TinyAccentCell">When enable block of response <Did> for <EcuName> ECU</td>
+
+</tr>
+	<tr>
+	<td class="CaptionCellDefault">Path to store artifacts</td>
+	<td class="TinyAccentCell"><a href="D:\temp\BatchRun_250703_135229\WhenEnableBlockOfResponseDidForEcu_250703_135229">D:\temp\BatchRun_250703_135229\WhenEnableBlockOfResponseDidForEcu_250703_135229</a></td>
+
+</tr>
+	<tr>
+	<td class="CaptionCellDefault">Test cases</td>
+	<td class="TinyAccentCell"><table>
+	<tr>
+	<td class="CaptionCellDefault">When enable block of response <Did> for <EcuName> ECU</td>
+	<td class="TinyAccentCell"><table class="ResultTable">
+	<tr>
+	<td class="CaptionCellDefault">Begin</td>
+	<td class="TinyAccentCell">03.07.2025 13:52:40</td>
+
+</tr>
+	<tr>
+	<td class="CaptionCellDefault">End</td>
+	<td class="TinyAccentCell">03.07.2025 13:52:43</td>
+
+</tr>
+	<tr>
+	<td class="CaptionCellDefault">Test duration</td>
+	<td class="TinyAccentCell">2 second</td>
+
+</tr>
+	<tr>
+	<td class="CaptionCellDefault">Test case name</td>
+	<td class="TinyAccentCell">When enable block of response <Did> for <EcuName> ECU</td>
+
+</tr>
+	<tr>
+	<td class="CaptionCellDefault">Path to store artifacts</td>
+	<td class="TinyAccentCell"><a href="D:\temp\BatchRun_250703_135229\WhenEnableBlockOfResponseDidForEcu_250703_135229\250703_135240_Precondition">D:\temp\BatchRun_250703_135229\WhenEnableBlockOfResponseDidForEcu_250703_135229\250703_135240_Precondition</a></td>
+
+</tr>
+	<tr>
+	<td class="CaptionCellDefault">Step</td>
+	<td class="TinyAccentCell"><table class="FullWidthTable">
+	<tr>
+	<td class="QueryCell">StartCarBusTrace</td>
+	<td class="NegativeResult">Fail</td>
+
+</tr>
+	<tr>
+	<td class="QueryCell">UnlockCentralLockingSystem</td>
+	<td class="NegativeResult">Fail</td>
+
+</tr>
+	<tr>
+	<td class="QueryCell">CarEntry</td>
+	<td class="NegativeResult">Fail</td>
+
+</tr>
+	<tr>
+	<td class="QueryCell">TurnOnClamp15</td>
+	<td class="PositiveResult">Pass</td>
+
+</tr>
+
+</table></td>
+
+</tr>
+	<tr>
+	<td class="CaptionCellDefault">Result</td>
+	<td class="ErrorResult">TestRunError</td>
+
+</tr>
+
+</table></td>
+
+</tr>
+	<tr>
+	<td class="CaptionCellDefault">When enable block of response <Did> for <EcuName> ECU</td>
+	<td class="TinyAccentCell"><table class="ResultTable">
+	<tr>
+	<td class="CaptionCellDefault">Begin</td>
+	<td class="TinyAccentCell">03.07.2025 13:52:43</td>
+
+</tr>
+	<tr>
+	<td class="CaptionCellDefault">End</td>
+	<td class="TinyAccentCell">03.07.2025 13:52:44</td>
+
+</tr>
+	<tr>
+	<td class="CaptionCellDefault">Test duration</td>
+	<td class="TinyAccentCell">under 1 second</td>
+
+</tr>
+	<tr>
+	<td class="CaptionCellDefault">Test case name</td>
+	<td class="TinyAccentCell">When enable block of response <Did> for <EcuName> ECU</td>
+
+</tr>
+	<tr>
+	<td class="CaptionCellDefault">Path to store artifacts</td>
+	<td class="TinyAccentCell"><a href="D:\temp\BatchRun_250703_135229\WhenEnableBlockOfResponseDidForEcu_250703_135229\250703_135243_TestCase">D:\temp\BatchRun_250703_135229\WhenEnableBlockOfResponseDidForEcu_250703_135229\250703_135243_TestCase</a></td>
+
+</tr>
+	<tr>
+	<td class="CaptionCellDefault">Step</td>
+	<td class="TinyAccentCell"><table class="FullWidthTable">
+	<tr>
+	<td class="QueryCell">enable block of response IVD-C for Clima ECU</td>
+	<td class="NegativeResult">Fail</td>
+
+</tr>
+	<tr>
+	<td class="QueryCell">response to request IVD-C is not sent for Clima ECU</td>
+	<td class="NegativeResult">Fail</td>
+
+</tr>
+
+</table></td>
+
+</tr>
+	<tr>
+	<td class="CaptionCellDefault">Result</td>
+	<td class="ErrorResult">TestRunError</td>
+
+</tr>
+
+</table></td>
+
+</tr>
+	<tr>
+	<td class="CaptionCellDefault">When enable block of response <Did> for <EcuName> ECU</td>
+	<td class="TinyAccentCell"><table class="ResultTable">
+	<tr>
+	<td class="CaptionCellDefault">Begin</td>
+	<td class="TinyAccentCell">03.07.2025 13:52:44</td>
+
+</tr>
+	<tr>
+	<td class="CaptionCellDefault">End</td>
+	<td class="TinyAccentCell">03.07.2025 13:52:46</td>
+
+</tr>
+	<tr>
+	<td class="CaptionCellDefault">Test duration</td>
+	<td class="TinyAccentCell">2 second</td>
+
+</tr>
+	<tr>
+	<td class="CaptionCellDefault">Test case name</td>
+	<td class="TinyAccentCell">When enable block of response <Did> for <EcuName> ECU</td>
+
+</tr>
+	<tr>
+	<td class="CaptionCellDefault">Path to store artifacts</td>
+	<td class="TinyAccentCell"><a href="D:\temp\BatchRun_250703_135229\WhenEnableBlockOfResponseDidForEcu_250703_135229\250703_135244_PostCondition">D:\temp\BatchRun_250703_135229\WhenEnableBlockOfResponseDidForEcu_250703_135229\250703_135244_PostCondition</a></td>
+
+</tr>
+	<tr>
+	<td class="CaptionCellDefault">Step</td>
+	<td class="TinyAccentCell"><table class="FullWidthTable">
+	<tr>
+	<td class="QueryCell">TurnOnClamp15</td>
+	<td class="PositiveResult">Pass</td>
+
+</tr>
+	<tr>
+	<td class="QueryCell">CarLeave</td>
+	<td class="NegativeResult">Fail</td>
+
+</tr>
+	<tr>
+	<td class="QueryCell">LockCentralLockingSystem</td>
+	<td class="NegativeResult">Fail</td>
+
+</tr>
+	<tr>
+	<td class="QueryCell">StopCarBusTrace</td>
+	<td class="NegativeResult">Fail</td>
+
+</tr>
+
+</table></td>
+
+</tr>
+	<tr>
+	<td class="CaptionCellDefault">Result</td>
+	<td class="ErrorResult">TestRunError</td>
+
+</tr>
+
+</table></td>
+
+</tr>
+
+</table></td>
+
+</tr>
+	<tr>
+	<td class="CaptionCellDefault">Result</td>
+	<td class="ErrorResult">TestRunError</td>
+
+</tr>
+
+</table><table class="SubHeadingTable">
+	<tr>
+	<td><div class="Heading2">End of report</div></td>
+
+</tr>
+
+</table></body>
+

@@ -269,35 +269,35 @@ User clicks "Create Issue" in webview
 
 ## Suggested Build Order
 
-| Stage | What | Why This Order |
-|-------|------|----------------|
-| 1 | Scaffold: `package.json`, `activate()` stub, empty TreeDataProvider, OutputChannel | Validates dev loop |
-| 2 | Phase 1 pipeline: LogParser → FeatureParser → StepExtractor → AnomalyDetector → Aggregator | Pure TypeScript, unit-testable without VS Code |
-| 3 | TreeView UI: wire "Run Analysis" command + anomaly hierarchy display | Needs Phase 1 data |
-| 4 | WebviewPanel: HTML scaffold, message-passing handshake, anomaly detail render | Needs TreeView wiring |
-| 5 | Symbol resolution + code navigation: `SymbolResolver`, `CodeExtractor`, `NullAiBackend` | Delivers value without AI |
-| 6 | Continue integration: inspect `ext.exports`, implement `ContinueExtensionAdapter` | Highest risk — last |
-| 7 | GitLab integration: `GitLabClient`, confirmation dialog, PAT via `SecretStorage` | Depends on full RCA output |
+| Stage | What                                                                                       | Why This Order                                 |
+|-------|--------------------------------------------------------------------------------------------|------------------------------------------------|
+| 1     | Scaffold: `package.json`, `activate()` stub, empty TreeDataProvider, OutputChannel         | Validates dev loop                             |
+| 2     | Phase 1 pipeline: LogParser → FeatureParser → StepExtractor → AnomalyDetector → Aggregator | Pure TypeScript, unit-testable without VS Code |
+| 3     | TreeView UI: wire "Run Analysis" command + anomaly hierarchy display                       | Needs Phase 1 data                             |
+| 4     | WebviewPanel: HTML scaffold, message-passing handshake, anomaly detail render              | Needs TreeView wiring                          |
+| 5     | Symbol resolution + code navigation: `SymbolResolver`, `CodeExtractor`, `NullAiBackend`    | Delivers value without AI                      |
+| 6     | Continue integration: inspect `ext.exports`, implement `ContinueExtensionAdapter`          | Highest risk — last                            |
+| 7     | GitLab integration: `GitLabClient`, confirmation dialog, PAT via `SecretStorage`           | Depends on full RCA output                     |
 
 ---
 
 ## Component Boundaries Summary
 
-| Component | Lives In | Primary VS Code API | Depends On |
-|---|---|---|---|
-| `ExtensionController` | Host | `commands`, `window`, `workspace` | All components |
-| `SidebarProvider` | Host | `TreeDataProvider`, `TreeItem` | `AnalysisEngine` |
-| `ResultsWebviewPanel` | Host shell + webview renderer | `WebviewPanel`, `postMessage` | `ExtensionController` |
-| `LogParser` | Host | `workspace.fs` | Nothing |
-| `FeatureParser` | Host | `workspace.fs` + `@cucumber/gherkin` | Nothing |
-| `StepExtractor` | Host | Pure TypeScript | `LogParser`, `FeatureParser` |
-| `AnomalyDetector` | Host | Pure TypeScript | `StepExtractor` |
-| `Aggregator` | Host | Node `crypto` (SHA-256) | `AnomalyDetector` |
-| `SymbolResolver` | Host | `commands.executeCommand` | Nothing |
-| `CodeExtractor` | Host | `workspace.openTextDocument` | `SymbolResolver` |
-| `ContinueClient` | Host | `extensions.getExtension`, `commands` | `CodeExtractor` |
-| `GitLabClient` | Host | `SecretStorage`, `fetch` | `IssueCandidate` |
-| `OutputChannel` | Host | `window.createOutputChannel` | Nothing |
+| Component             | Lives In                      | Primary VS Code API                   | Depends On                   |
+|-----------------------|-------------------------------|---------------------------------------|------------------------------|
+| `ExtensionController` | Host                          | `commands`, `window`, `workspace`     | All components               |
+| `SidebarProvider`     | Host                          | `TreeDataProvider`, `TreeItem`        | `AnalysisEngine`             |
+| `ResultsWebviewPanel` | Host shell + webview renderer | `WebviewPanel`, `postMessage`         | `ExtensionController`        |
+| `LogParser`           | Host                          | `workspace.fs`                        | Nothing                      |
+| `FeatureParser`       | Host                          | `workspace.fs` + `@cucumber/gherkin`  | Nothing                      |
+| `StepExtractor`       | Host                          | Pure TypeScript                       | `LogParser`, `FeatureParser` |
+| `AnomalyDetector`     | Host                          | Pure TypeScript                       | `StepExtractor`              |
+| `Aggregator`          | Host                          | Node `crypto` (SHA-256)               | `AnomalyDetector`            |
+| `SymbolResolver`      | Host                          | `commands.executeCommand`             | Nothing                      |
+| `CodeExtractor`       | Host                          | `workspace.openTextDocument`          | `SymbolResolver`             |
+| `ContinueClient`      | Host                          | `extensions.getExtension`, `commands` | `CodeExtractor`              |
+| `GitLabClient`        | Host                          | `SecretStorage`, `fetch`              | `IssueCandidate`             |
+| `OutputChannel`       | Host                          | `window.createOutputChannel`          | Nothing                      |
 
 ---
 
