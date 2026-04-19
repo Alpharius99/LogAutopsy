@@ -7,23 +7,14 @@ function getNonce(): string {
 }
 
 function getWebviewHtml(_webview: vscode.Webview): string {
-  const _nonce = getNonce();  // Pre-wired; used in Phase 3 for script-src nonce
+  const _nonce = getNonce();  // Pre-wired; used in Phase 3 for script-src nonce (rename to `nonce` and thread into CSP + <script> tag)
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="Content-Security-Policy"
-        content="default-src 'none'; style-src 'unsafe-inline';">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none';">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LogAutopsy</title>
-  <style>
-    body {
-      color: var(--vscode-editor-foreground);
-      background-color: var(--vscode-editor-background);
-      font-family: var(--vscode-font-family);
-      padding: 16px;
-    }
-  </style>
 </head>
 <body>
   <p>Select an artifact to begin analysis.</p>
