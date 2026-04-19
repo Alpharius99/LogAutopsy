@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: verifying
-stopped_at: "Checkpoint: Task 3 human-verify pending for 01-scaffold-02-PLAN.md"
-last_updated: "2026-04-19T18:10:22.353Z"
+stopped_at: Completed 01-scaffold-02-PLAN.md — Phase 01 complete
+last_updated: "2026-04-19T22:27:48.722Z"
 last_activity: 2026-04-19
 progress:
   total_phases: 6
@@ -54,6 +54,7 @@ Progress: [░░░░░░░░░░] 0%
 *Updated after each plan completion*
 | Phase 01-scaffold P01 | 356 | 2 tasks | 8 files |
 | Phase 01-scaffold P02 | 999 | 2 tasks | 9 files |
+| Phase 01-scaffold P02 | 420 | 3 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -68,6 +69,9 @@ Recent decisions affecting current work:
 - [Phase 01-scaffold]: activationEvents set to empty array; VS Code 1.74+ auto-infers from contributes entries
 - [Phase 01-scaffold]: npm-run-all required for cross-platform parallel watch scripts (esbuild watch + tsc watch simultaneously)
 - [Phase 01-scaffold]: tsconfig.json rootDir removed — conflicts with test/ include; tsconfig target ES2022 (TS 5.4.5 max); compile-tests script added for test emit; @vscode/test-electron installed as missing peer dep
+- [Phase 01-scaffold]: D-02 boundary enforced: src/core/ and src/types.ts have zero vscode imports — verified by grep
+- [Phase 01-scaffold]: Webview CSP: default-src 'none'; style-src 'unsafe-inline'; enableScripts: false — no CSP violations in Phase 1 Extension Development Host
+- [Phase 01-scaffold]: hashKey SHA-256 implemented using Node.js crypto.createHash, not stubbed — pure computation with no phase-2 dependency
 
 ### Pending Todos
 
@@ -90,6 +94,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-19T18:10:22.351Z
-Stopped at: Checkpoint: Task 3 human-verify pending for 01-scaffold-02-PLAN.md
+Last session: 2026-04-19T22:27:48.720Z
+Stopped at: Completed 01-scaffold-02-PLAN.md — Phase 01 complete
 Resume file: None
