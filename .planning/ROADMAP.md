@@ -32,7 +32,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. `npm test` runs and exits cleanly (even with zero test cases)
 **Plans**: 2 plans
 Plans:
-- [ ] 01-01-PLAN.md -- Build infrastructure: package.json, tsconfig, esbuild, test config, npm install
+- [x] 01-01-PLAN.md -- Build infrastructure: package.json, tsconfig, esbuild, test config, npm install
 - [ ] 01-02-PLAN.md -- Source stubs: types, core, extension, UI, test, compile and verify
 
 ### Phase 2: Parsing Pipeline
@@ -99,7 +99,7 @@ Note: Phase 6 depends on Phase 3 (not Phase 5) -- GitLab content assembly does n
 
 | Phase                   | Plans Complete | Status      | Completed |
 |-------------------------|----------------|-------------|-----------|
-| 1. Scaffold             | 0/2            | Planning    | -         |
+| 1. Scaffold             | 1/2 | In Progress|  |
 | 2. Parsing Pipeline     | 0/?            | Not started | -         |
 | 3. Results UI           | 0/?            | Not started | -         |
 | 4. Symbol Resolution    | 0/?            | Not started | -         |
