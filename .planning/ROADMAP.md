@@ -12,7 +12,7 @@ LogAutopsy ships in six phases aligned to the technical dependency chain. Phase 
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Scaffold** - Extension skeleton with working dev loop, esbuild pipeline, and CSP-correct webview
+- [x] **Phase 1: Scaffold** - Extension skeleton with working dev loop, esbuild pipeline, and CSP-correct webview (completed 2026-04-19)
 - [ ] **Phase 2: Parsing Pipeline** - Full deterministic log parsing, anomaly detection, and ranking -- validated against real example artifacts
 - [ ] **Phase 3: Results UI** - TreeView sidebar and detail webview showing ranked anomalies with step and phase context
 - [ ] **Phase 4: Symbol Resolution** - Deterministic C# source location with graceful fallback when unavailable
@@ -33,7 +33,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 2 plans
 Plans:
 - [x] 01-01-PLAN.md -- Build infrastructure: package.json, tsconfig, esbuild, test config, npm install
-- [ ] 01-02-PLAN.md -- Source stubs: types, core, extension, UI, test, compile and verify
+- [x] 01-02-PLAN.md -- Source stubs: types, core, extension, UI, test, compile and verify
 
 ### Phase 2: Parsing Pipeline
 **Goal**: Given a real BatchRun folder, the tool produces a ranked anomaly list -- validated for correctness against the production example artifacts in `examples/`
@@ -99,7 +99,7 @@ Note: Phase 6 depends on Phase 3 (not Phase 5) -- GitLab content assembly does n
 
 | Phase                   | Plans Complete | Status      | Completed |
 |-------------------------|----------------|-------------|-----------|
-| 1. Scaffold             | 1/2 | In Progress|  |
+| 1. Scaffold             | 2/2 | Complete   | 2026-04-19 |
 | 2. Parsing Pipeline     | 0/?            | Not started | -         |
 | 3. Results UI           | 0/?            | Not started | -         |
 | 4. Symbol Resolution    | 0/?            | Not started | -         |
