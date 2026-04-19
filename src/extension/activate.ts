@@ -1,8 +1,7 @@
 // src/extension/activate.ts
 import * as vscode from 'vscode';
-import { runAnalysis } from './commands';
+import { runAnalysis, openWebview } from './commands';
 import { LogAutopsySidebarProvider } from '../ui/sidebar';
-import { createOrShowWebviewPanel } from '../ui/webview';
 
 export function activate(context: vscode.ExtensionContext): void {
   // Register logautopsy.runAnalysis command
@@ -13,7 +12,7 @@ export function activate(context: vscode.ExtensionContext): void {
   // Register logautopsy.openWebview command
   context.subscriptions.push(
     vscode.commands.registerCommand('logautopsy.openWebview', () =>
-      createOrShowWebviewPanel(context)
+      openWebview(context)
     )
   );
 

@@ -1,5 +1,6 @@
 // src/extension/commands.ts
 import * as vscode from 'vscode';
+import { createOrShowWebviewPanel } from '../ui/webview';
 
 /**
  * Handler for logautopsy.runAnalysis command.
@@ -11,10 +12,10 @@ export async function runAnalysis(): Promise<void> {
 
 /**
  * Handler for logautopsy.openWebview command.
- * Phase 1: placeholder only.
+ * Routes to createOrShowWebviewPanel so all command handlers are co-located here.
  */
-export async function openWebview(
-  _context: vscode.ExtensionContext
-): Promise<void> {
-  vscode.window.showInformationMessage('LogAutopsy: Webview not yet implemented.');
+export function openWebview(
+  context: vscode.ExtensionContext
+): void {
+  createOrShowWebviewPanel(context);
 }
