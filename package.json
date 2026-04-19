@@ -47,7 +47,7 @@
     "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
     "package": "npm run check-types && node esbuild.js --production",
     "check-types": "tsc --noEmit",
-    "pretest": "npm run compile && npm run compile-tests",
+    "pretest": "npm run compile && npm run compile-tests && node -e \"require('fs').accessSync('out/test/suite/extension.test.js')\"",
     "test": "vscode-test"
   },
   "devDependencies": {
