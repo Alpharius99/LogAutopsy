@@ -45,7 +45,13 @@ Plans:
   3. Every Gherkin step boundary is extracted from GherkinExecutor markers and correlated to the correct step name and phase (Precondition / TestCase / PostCondition)
   4. Identical errors within the same step are grouped into a single aggregated entry
   5. The ranked output labels the earliest anomaly "Primary root cause" and subsequent anomalies "Secondary effect"
-**Plans**: TBD
+**Plans**: 5 plans
+Plans:
+- [ ] 02-01-PLAN.md -- Install Cucumber deps, rewrite types.ts to spec §5 shape, create 6 test stubs
+- [ ] 02-02-PLAN.md -- Implement parser.ts (parseLog) and featureParser.ts (parseFeature) with unit tests
+- [ ] 02-03-PLAN.md -- Create stepExtractor.ts (extractSteps) with unit tests
+- [ ] 02-04-PLAN.md -- Implement detector.ts (detectAnomalies) and aggregator.ts (aggregateAnomalies + rankAnomalies) with unit tests
+- [ ] 02-05-PLAN.md -- Create engine.ts (runBatch), update commands.ts, integration test and human verification
 
 ### Phase 3: Results UI
 **Goal**: Analyst can see ranked anomalies in the VS Code sidebar and open a detail webview for any anomaly -- using Phase 2 data, no AI required
@@ -100,7 +106,7 @@ Note: Phase 6 depends on Phase 3 (not Phase 5) -- GitLab content assembly does n
 | Phase                   | Plans Complete | Status      | Completed |
 |-------------------------|----------------|-------------|-----------|
 | 1. Scaffold             | 2/2 | Complete   | 2026-04-19 |
-| 2. Parsing Pipeline     | 0/?            | Not started | -         |
+| 2. Parsing Pipeline     | 0/5            | Not started | -         |
 | 3. Results UI           | 0/?            | Not started | -         |
 | 4. Symbol Resolution    | 0/?            | Not started | -         |
 | 5. Continue Integration | 0/?            | Not started | -         |
