@@ -1,6 +1,6 @@
 {
-  "name": "logautopsy",
-  "displayName": "LogAutopsy",
+  "name": "test-analysis-agent",
+  "displayName": "test-analysis-agent",
   "description": "Automated test failure root cause analysis for VS Code",
   "version": "0.1.0",
   "publisher": "logautopsy-dev",
@@ -10,32 +10,87 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onCommand:testAnalysisAgent.loadTestArtifacts",
+    "onCommand:testAnalysisAgent.runPhase1Analysis",
+    "onCommand:testAnalysisAgent.runRootCauseAnalysis",
+    "onCommand:testAnalysisAgent.createGitLabIssues"
+  ],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "logautopsy.runAnalysis",
-        "title": "Run Analysis",
-        "category": "LogAutopsy"
+        "command": "testAnalysisAgent.loadTestArtifacts",
+        "title": "Load Test Artifacts",
+        "category": "Test Analysis Agent"
+      },
+      {
+        "command": "testAnalysisAgent.runPhase1Analysis",
+        "title": "Run Phase 1 Analysis",
+        "category": "Test Analysis Agent"
+      },
+      {
+        "command": "testAnalysisAgent.runRootCauseAnalysis",
+        "title": "Run Root Cause Analysis",
+        "category": "Test Analysis Agent"
+      },
+      {
+        "command": "testAnalysisAgent.createGitLabIssues",
+        "title": "Create GitLab Issues",
+        "category": "Test Analysis Agent"
       }
     ],
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "logautopsy-container",
-          "title": "LogAutopsy",
+          "id": "testAnalysisAgent-container",
+          "title": "Test Analysis",
           "icon": "media/icon.svg"
         }
       ]
     },
     "views": {
-      "logautopsy-container": [
+      "testAnalysisAgent-container": [
         {
-          "id": "logautopsy.sidebar",
+          "id": "testAnalysisAgent.sidebar",
           "name": "Analysis Results"
         }
       ]
+    },
+    "configuration": {
+      "title": "Test Analysis Agent",
+      "properties": {
+        "testAnalysisAgent.gitlab.baseUrl": {
+          "type": "string",
+          "default": "",
+          "description": "GitLab base URL, for example https://gitlab.example.com"
+        },
+        "testAnalysisAgent.gitlab.projectId": {
+          "type": "string",
+          "default": "",
+          "description": "GitLab project ID or URL-encoded path"
+        },
+        "testAnalysisAgent.gitlab.token": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "GitLab personal access token used for issue creation."
+        },
+        "testAnalysisAgent.continue.vendor": {
+          "type": "string",
+          "default": "",
+          "description": "Optional VS Code language model vendor selector."
+        },
+        "testAnalysisAgent.continue.family": {
+          "type": "string",
+          "default": "",
+          "description": "Optional VS Code language model family selector."
+        },
+        "testAnalysisAgent.continue.modelId": {
+          "type": "string",
+          "default": "",
+          "description": "Optional VS Code language model id selector."
+        }
+      }
     }
   },
   "scripts": {
@@ -55,6 +110,7 @@
     "@types/node": "^25.6.0",
     "@types/vscode": "^1.90.0",
     "@vscode/test-cli": "^0.0.9",
+    "@vscode/test-electron": "^2.5.2",
     "@vscode/vsce": "^3",
     "esbuild": "^0.21",
     "mocha": "^10",

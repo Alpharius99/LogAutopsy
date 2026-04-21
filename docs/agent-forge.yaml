@@ -2,7 +2,8 @@ agent:
   name: RootCauseAnalyzerAgent
   description: >
     Performs structured root cause analysis for test failures using
-    stack traces, logs, and C# code context.
+    stack traces, logs, and C# code context, and generates a
+    GitLab-ready issue description.
 
   input_schema:
     type: object
@@ -13,6 +14,7 @@ agent:
       - step
       - phase
       - code_context
+      - context
     properties:
       exception_type:
         type: string
@@ -34,6 +36,14 @@ agent:
             type: string
           code:
             type: string
+      context:
+        type: object
+        required: [file, line]
+        properties:
+          file:
+            type: string
+          line:
+            type: number
 
   output_schema:
     type: object
@@ -42,6 +52,8 @@ agent:
       - hypothesis
       - fix_suggestion
       - confidence
+      - issue_description
+      - issue_fields
     properties:
       root_cause:
         type: string
@@ -49,16 +61,24 @@ agent:
         type: object
         required: [cause, mechanism, trigger]
         properties:
-          cause:
-            type: string
-          mechanism:
-            type: string
-          trigger:
-            type: string
+          cause: { type: string }
+          mechanism: { type: string }
+          trigger: { type: string }
       fix_suggestion:
         type: string
       confidence:
         type: number
+      issue_description:
+        type: string
+      issue_fields:
+        type: object
+        required: [step, class, method, file, line]
+        properties:
+          step: { type: string }
+          class: { type: string }
+          method: { type: string }
+          file: { type: string }
+          line: { type: number }
 
 workflow:
   steps:
@@ -72,7 +92,6 @@ workflow:
         - exception_type
         - method (from stack trace)
         - operation (failing action)
-
       output_schema:
         type: object
         required: [exception_type, method, operation]
@@ -92,7 +111,6 @@ workflow:
         Return JSON:
         - failure_point
         - line_hint
-
       output_schema:
         type: object
         required: [failure_point]
@@ -114,7 +132,6 @@ workflow:
         Return JSON:
         - summary
         - risk_points (array)
-
       output_schema:
         type: object
         required: [summary, risk_points]
@@ -136,7 +153,6 @@ workflow:
 
         Return JSON:
         - evidence (array)
-
       output_schema:
         type: object
         required: [evidence]
@@ -161,7 +177,6 @@ workflow:
         Return JSON:
         - valid (true/false)
         - reasoning
-
       output_schema:
         type: object
         required: [valid, reasoning]
@@ -170,19 +185,53 @@ workflow:
           reasoning: { type: string }
 
     - id: final_output
-      description: Produce final root cause analysis
+      description: Produce final root cause analysis and GitLab issue description
       depends_on: [validate_hypothesis]
       condition: "steps.validate_hypothesis.valid == true"
       prompt: |
         Produce final root cause analysis.
 
-        Must include:
-        - root_cause
-        - hypothesis (cause, mechanism, trigger)
-        - fix_suggestion (concrete, Level B)
-        - confidence (0–1)
+        Additionally, generate a GitLab issue description using EXACT structure below.
 
-        Return JSON only.
+        TEMPLATE:
+
+        ## Summary
+        Brief explanation of the failure.
+
+        ## Failing Step
+        {{step}} ({{phase}} phase)
+
+        ## Root Cause
+        {{code_context.class}}.{{code_context.method}}()
+
+        ## Hypothesis
+        Cause: ...
+        Mechanism: ...
+        Trigger: ...
+
+        ## Suggested Fix
+        ...
+
+        ## Evidence
+        - First occurrence: {{context.file}}:{{context.line}}
+
+        Stack trace:
+        {{stacktrace}}
+
+        RULES:
+        - Follow section order EXACTLY
+        - Do not omit sections
+        - Do not add extra sections
+        - Be concise and technical
+        - Use provided values where applicable
+
+        Return JSON with:
+        - root_cause
+        - hypothesis
+        - fix_suggestion
+        - confidence (0–1)
+        - issue_description (string)
+        - issue_fields (structured fields)
 
       output_schema:
         type: object
@@ -191,6 +240,8 @@ workflow:
           - hypothesis
           - fix_suggestion
           - confidence
+          - issue_description
+          - issue_fields
         properties:
           root_cause: { type: string }
           hypothesis:
@@ -202,6 +253,16 @@ workflow:
               trigger: { type: string }
           fix_suggestion: { type: string }
           confidence: { type: number }
+          issue_description: { type: string }
+          issue_fields:
+            type: object
+            required: [step, class, method, file, line]
+            properties:
+              step: { type: string }
+              class: { type: string }
+              method: { type: string }
+              file: { type: string }
+              line: { type: number }
 
   control_flow:
     on_validation_failure:

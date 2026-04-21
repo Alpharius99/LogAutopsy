@@ -1,28 +1,19 @@
 // src/extension/activate.ts
 import * as vscode from 'vscode';
-import { runAnalysis, openWebview } from './commands';
+import { registerCommands } from '../commands';
 import { LogAutopsySidebarProvider } from '../ui/sidebar';
+import { AnalysisStore } from '../utils/analysisStore';
 
 export function activate(context: vscode.ExtensionContext): void {
-  // Register logautopsy.runAnalysis command
+  const store = new AnalysisStore();
+  registerCommands(context, store);
+  const sidebarProvider = new LogAutopsySidebarProvider(store);
   context.subscriptions.push(
-    vscode.commands.registerCommand('logautopsy.runAnalysis', () => runAnalysis())
+    vscode.window.registerTreeDataProvider('testAnalysisAgent.sidebar', sidebarProvider)
   );
-
-  // Register logautopsy.openWebview command
-  context.subscriptions.push(
-    vscode.commands.registerCommand('logautopsy.openWebview', () =>
-      openWebview(context)
-    )
-  );
-
-  // Register sidebar TreeDataProvider
-  const sidebarProvider = new LogAutopsySidebarProvider();
-  context.subscriptions.push(
-    vscode.window.registerTreeDataProvider('logautopsy.sidebar', sidebarProvider)
-  );
+  context.subscriptions.push(store);
 }
 
 export function deactivate(): void {
-  // Nothing to clean up in Phase 1
+  // Extension state is ephemeral per session.
 }
