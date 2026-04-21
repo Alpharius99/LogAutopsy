@@ -439,17 +439,19 @@ All share: sourceClass='AdapterXil.WebApiCalls', sourceMethod='WaitForTask',
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **`keywordType` on gherkin AST step nodes in v28**
    - What we know: The spec §5 `GherkinStep` requires `keywordType: 'Action'|'Conjunction'|'Outcome'`. Context7 docs show the field exists. The real feature file uses When/And/Then keywords.
    - What's unclear: Whether `@cucumber/gherkin@28.0.0` AST nodes populate `step.keywordType` or whether it requires the Pickle API.
    - Recommendation: Install the package in a scratch test and `console.log(step.keywordType)` before committing to the AST path. If not available, derive from keyword string (mapping in implementation task).
+   - **RESOLUTION:** Plans use `(s as any).keywordType ?? deriveKeywordType(s.keyword.trim())` — the fallback `deriveKeywordType` function maps `Then` → `'Outcome'`, `And`/`But` → `'Conjunction'`, everything else → `'Action'`. This handles v28 AST nodes regardless of whether `keywordType` is populated.
 
 2. **`vscode.workspace.fs` in non-workspace context (no folder open)**
    - What we know: `vscode.workspace.fs` works when a workspace folder is open. `showOpenDialog` can open any folder.
    - What's unclear: Whether `vscode.workspace.fs.readFile` works with arbitrary URIs outside the workspace root, or requires the URI to be within an opened workspace folder.
    - Recommendation: Use `vscode.Uri.file(path)` from the dialog result — this creates a `file://` URI that `vscode.workspace.fs` handles regardless of workspace membership. Verify by testing in Extension Development Host.
+   - **RESOLUTION:** Plans use `vscode.Uri.file(pickedFolderPath)` for all URIs derived from `showOpenDialog`. The `file://` scheme is handled by `vscode.workspace.fs` regardless of whether the path is inside an open workspace folder.
 
 ---
 
@@ -544,3 +546,4 @@ This phase has no authentication, network calls, user input processing, cryptogr
 
 **Research date:** 2026-04-20
 **Valid until:** 2026-05-20 (stable domain; @cucumber/gherkin v28 is pinned)
+

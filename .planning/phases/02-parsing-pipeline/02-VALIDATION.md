@@ -19,7 +19,7 @@ created: 2026-04-20
 |----------|-------|
 | **Framework** | Mocha 10.x via `@vscode/test-cli` |
 | **Config file** | `.vscode-test.mjs` (Wave 0 installs) |
-| **Quick run command** | `npm run test:unit` |
+| **Quick run command** | `npm run compile-tests` |
 | **Full suite command** | `npm test` |
 | **Estimated runtime** | ~15 seconds |
 
@@ -27,8 +27,8 @@ created: 2026-04-20
 
 ## Sampling Rate
 
-- **After every task commit:** Run `npm run test:unit`
-- **After every plan wave:** Run `npm test`
+- **After every task commit:** Run `npm run compile-tests` (fast TypeScript type check — no Extension Development Host needed)
+- **After every plan wave:** Run `npm test` (full suite including Extension Development Host)
 - **Before `/gsd-verify-work`:** Full suite must be green
 - **Max feedback latency:** 15 seconds
 
@@ -38,14 +38,15 @@ created: 2026-04-20
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| 2-01-01 | 01 | 1 | LOAD-01 | — | N/A | unit | `npm run test:unit -- --grep "artifact discovery"` | ❌ W0 | ⬜ pending |
-| 2-01-02 | 01 | 1 | LOAD-02 | — | N/A | unit | `npm run test:unit -- --grep "artifact discovery"` | ❌ W0 | ⬜ pending |
-| 2-02-01 | 02 | 1 | PARSE-01 | — | N/A | unit | `npm run test:unit -- --grep "log parser"` | ❌ W0 | ⬜ pending |
-| 2-02-02 | 02 | 1 | PARSE-02 | — | N/A | unit | `npm run test:unit -- --grep "log parser"` | ❌ W0 | ⬜ pending |
-| 2-02-03 | 02 | 1 | PARSE-03 | — | N/A | unit | `npm run test:unit -- --grep "log parser"` | ❌ W0 | ⬜ pending |
-| 2-03-01 | 03 | 2 | DETECT-01 | — | N/A | unit | `npm run test:unit -- --grep "anomaly detection"` | ❌ W0 | ⬜ pending |
-| 2-03-02 | 03 | 2 | DETECT-02 | — | N/A | unit | `npm run test:unit -- --grep "anomaly detection"` | ❌ W0 | ⬜ pending |
-| 2-03-03 | 03 | 2 | DETECT-03 | — | N/A | integration | `npm test -- --grep "integration"` | ❌ W0 | ⬜ pending |
+| 2-01-01 | 01 | 1 | LOAD-01 | — | N/A | unit | `npm run compile-tests && npm test` | ❌ W0 | ⬜ pending |
+| 2-01-02 | 01 | 1 | LOAD-02 | — | N/A | unit | `npm run compile-tests && npm test` | ❌ W0 | ⬜ pending |
+| 2-02-01 | 02 | 2 | PARSE-01 | T-02-02-01, T-02-02-02 | N/A | unit+tdd | `npm run compile-tests && npm test` | ❌ W0 | ⬜ pending |
+| 2-02-02 | 02 | 2 | PARSE-02 | T-02-02-03 | N/A | unit+tdd | `npm run compile-tests && npm test` | ❌ W0 | ⬜ pending |
+| 2-03-01 | 03 | 3 | PARSE-03 | T-02-03-01, T-02-03-02 | N/A | unit+tdd | `npm run compile-tests && npm test` | ❌ W0 | ⬜ pending |
+| 2-04-01 | 04 | 4 | DETECT-01 | — | N/A | unit+tdd | `npm run compile-tests && npm test` | ❌ W0 | ⬜ pending |
+| 2-04-02 | 04 | 4 | DETECT-02 | — | N/A | unit+tdd | `npm run compile-tests && npm test` | ❌ W0 | ⬜ pending |
+| 2-05-01 | 05 | 5 | DETECT-03 | — | N/A | unit+tdd | `npm run compile-tests && npm test` | ❌ W0 | ⬜ pending |
+| 2-05-02 | 05 | 5 | LOAD-02 | — | N/A | integration | `npm test` | ❌ W0 | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -53,11 +54,13 @@ created: 2026-04-20
 
 ## Wave 0 Requirements
 
-- [ ] `src/test/unit/artifactDiscovery.test.ts` — stubs for LOAD-01, LOAD-02
-- [ ] `src/test/unit/logParser.test.ts` — stubs for PARSE-01, PARSE-02, PARSE-03
-- [ ] `src/test/unit/anomalyDetection.test.ts` — stubs for DETECT-01, DETECT-02
-- [ ] `src/test/integration/parsingPipeline.test.ts` — end-to-end stub for DETECT-03
-- [ ] `src/test/fixtures/` — copy of example log and feature file for tests
+- [ ] `test/suite/parser.test.ts` — covers PARSE-01 (log parsing unit tests)
+- [ ] `test/suite/featureParser.test.ts` — covers PARSE-02 (Gherkin parsing unit tests)
+- [ ] `test/suite/stepExtractor.test.ts` — covers PARSE-03 (step boundary unit tests)
+- [ ] `test/suite/detector.test.ts` — covers DETECT-01 (anomaly detection unit tests)
+- [ ] `test/suite/aggregator.test.ts` — covers DETECT-02, DETECT-03 (aggregation + ranking unit tests)
+- [ ] `test/suite/pipeline.test.ts` — integration test covering LOAD-02 and full pipeline against `examples/`
+- [ ] Install: `npm install --save-dev @cucumber/gherkin@28.0.0 @cucumber/messages@24.1.0`
 
 ---
 
