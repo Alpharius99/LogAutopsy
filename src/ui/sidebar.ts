@@ -56,23 +56,16 @@ export class LogAutopsySidebarProvider implements vscode.TreeDataProvider<Sideba
     }
 
     const state = this.store.getState();
-    if (!state.artifact) {
-      return Promise.resolve([
-        new SidebarItem(
-          'No artifacts loaded',
-          vscode.TreeItemCollapsibleState.None,
-          [],
-          'Run Load Test Artifacts'
-        ),
-      ]);
+    if (!state.phase1 && state.rootCauses.length === 0) {
+      return Promise.resolve([]);
     }
 
     const roots: SidebarItem[] = [
       new SidebarItem(
-        state.artifact.name,
+        state.artifact?.name ?? 'No artifact metadata',
         vscode.TreeItemCollapsibleState.None,
         [],
-        'Loaded artifact'
+        state.artifact ? 'Loaded artifact' : 'Derived from current analysis'
       ),
     ];
 

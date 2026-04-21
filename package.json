@@ -4,6 +4,16 @@
   "description": "Automated test failure root cause analysis for VS Code",
   "version": "0.1.0",
   "publisher": "logautopsy-dev",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Alpharius99/LogAutopsy.git"
+  },
+  "homepage": "https://github.com/Alpharius99/LogAutopsy",
+  "bugs": {
+    "url": "https://github.com/Alpharius99/LogAutopsy/issues"
+  },
+  "icon": "media/icon.png",
   "engines": {
     "vscode": "^1.90.0"
   },
@@ -14,7 +24,9 @@
     "onCommand:testAnalysisAgent.loadTestArtifacts",
     "onCommand:testAnalysisAgent.runPhase1Analysis",
     "onCommand:testAnalysisAgent.runRootCauseAnalysis",
-    "onCommand:testAnalysisAgent.createGitLabIssues"
+    "onCommand:testAnalysisAgent.createGitLabIssues",
+    "onView:testAnalysisAgent.controls",
+    "onView:testAnalysisAgent.sidebar"
   ],
   "main": "./dist/extension.js",
   "contributes": {
@@ -52,8 +64,44 @@
     "views": {
       "testAnalysisAgent-container": [
         {
+          "id": "testAnalysisAgent.controls",
+          "name": "Controls",
+          "type": "webview"
+        },
+        {
           "id": "testAnalysisAgent.sidebar",
           "name": "Analysis Results"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "testAnalysisAgent.sidebar",
+        "when": "true",
+        "contents": "No analysis results yet.\n[Load Test Artifacts](command:testAnalysisAgent.loadTestArtifacts)\n\nRun the deterministic pipeline first.\n[Run Phase 1 Analysis](command:testAnalysisAgent.runPhase1Analysis)\n\nThen run the AI workflow.\n[Run Root Cause Analysis](command:testAnalysisAgent.runRootCauseAnalysis)\n\nCreate issues after reviewing the results.\n[Create GitLab Issues](command:testAnalysisAgent.createGitLabIssues)"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "testAnalysisAgent.loadTestArtifacts",
+          "when": "view == testAnalysisAgent.controls || view == testAnalysisAgent.sidebar",
+          "group": "navigation@1"
+        },
+        {
+          "command": "testAnalysisAgent.runPhase1Analysis",
+          "when": "view == testAnalysisAgent.controls || view == testAnalysisAgent.sidebar",
+          "group": "navigation@2"
+        },
+        {
+          "command": "testAnalysisAgent.runRootCauseAnalysis",
+          "when": "view == testAnalysisAgent.controls || view == testAnalysisAgent.sidebar",
+          "group": "navigation@3"
+        },
+        {
+          "command": "testAnalysisAgent.createGitLabIssues",
+          "when": "view == testAnalysisAgent.controls || view == testAnalysisAgent.sidebar",
+          "group": "navigation@4"
         }
       ]
     },
