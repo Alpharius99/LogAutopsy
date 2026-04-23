@@ -293,7 +293,7 @@ export class TestAnalysisControlPanelProvider implements vscode.WebviewViewProvi
       <div class="button-list">
         <div class="button-row">
           ${this.buttonHtml('Load Full Input', 'testAnalysisAgent.loadTestArtifacts')}
-          ${this.buttonHtml('Load Log Only', 'testAnalysisAgent.loadLogOnly', false, 'secondary')}
+          ${this.buttonHtml('Load Log Only', 'testAnalysisAgent.loadLogOnly')}
         </div>
         ${this.buttonHtml(
           'Run Phase 1 Analysis',

@@ -102,7 +102,7 @@
       {
         "view": "testAnalysisAgent.sidebar",
         "when": "true",
-        "contents": "No analysis results yet.\n[Load Full Input](command:testAnalysisAgent.loadTestArtifacts)\n[Load Log Only](command:testAnalysisAgent.loadLogOnly)\n\nRun the deterministic pipeline first.\n[Run Phase 1 Analysis](command:testAnalysisAgent.runPhase1Analysis)\n\nThen run the AI workflow.\n[Run Root Cause Analysis](command:testAnalysisAgent.runRootCauseAnalysis)\n\nCreate issues after reviewing the results.\n[Create GitLab Issues](command:testAnalysisAgent.createGitLabIssues)"
+        "contents": "No analysis results yet.\n\nUse the Controls panel above to load input and run the analysis workflow."
       }
     ],
     "configuration": {
