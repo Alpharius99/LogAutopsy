@@ -26,6 +26,9 @@
     "onCommand:testAnalysisAgent.runPhase1Analysis",
     "onCommand:testAnalysisAgent.runRootCauseAnalysis",
     "onCommand:testAnalysisAgent.createGitLabIssues",
+    "onCommand:testAnalysisAgent.showDiagnostics",
+    "onCommand:testAnalysisAgent.copyLastDiagnosticMessage",
+    "onCommand:testAnalysisAgent.copyContinuePrompt",
     "onView:testAnalysisAgent.controls",
     "onView:testAnalysisAgent.sidebar"
   ],
@@ -55,6 +58,21 @@
       {
         "command": "testAnalysisAgent.createGitLabIssues",
         "title": "Create GitLab Issues",
+        "category": "Test Analysis Agent"
+      },
+      {
+        "command": "testAnalysisAgent.showDiagnostics",
+        "title": "Show Diagnostics",
+        "category": "Test Analysis Agent"
+      },
+      {
+        "command": "testAnalysisAgent.copyLastDiagnosticMessage",
+        "title": "Copy Last Diagnostic Message",
+        "category": "Test Analysis Agent"
+      },
+      {
+        "command": "testAnalysisAgent.copyContinuePrompt",
+        "title": "Copy Continue Prompt",
         "category": "Test Analysis Agent"
       }
     ],

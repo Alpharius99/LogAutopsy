@@ -130,6 +130,7 @@ export interface RootCauseAnalysis {
   anomalyKey: string;
   aggregatedAnomaly: AggregatedAnomaly;
   resolvedTarget?: CodeCandidate;
+  candidateTargets?: CodeCandidate[];
   workflow: {
     extract_context: Record<string, unknown>;
     identify_failure_point: Record<string, unknown>;
@@ -138,6 +139,7 @@ export interface RootCauseAnalysis {
     validate_hypothesis: Record<string, unknown>;
   };
   finalOutput: FinalAiOutput;
+  continuePrompt?: string;
 }
 
 export interface IssueCandidate {
@@ -167,4 +169,5 @@ export interface AnalysisStoreState {
   artifact?: ArtifactPair;
   phase1?: Phase1Result;
   rootCauses: RootCauseAnalysis[];
+  selectedRootCauseKey?: string;
 }

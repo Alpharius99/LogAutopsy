@@ -6,7 +6,8 @@ type ControlCommand =
   | 'testAnalysisAgent.loadLogOnly'
   | 'testAnalysisAgent.runPhase1Analysis'
   | 'testAnalysisAgent.runRootCauseAnalysis'
-  | 'testAnalysisAgent.createGitLabIssues';
+  | 'testAnalysisAgent.createGitLabIssues'
+  | 'testAnalysisAgent.copyContinuePrompt';
 
 function escapeHtml(value: string): string {
   return value
@@ -34,8 +35,13 @@ export class TestAnalysisControlPanelProvider implements vscode.WebviewViewProvi
       localResourceRoots: [this.extensionUri],
     };
 
-    webviewView.webview.onDidReceiveMessage((message: { command?: string }) => {
+    webviewView.webview.onDidReceiveMessage((message: { command?: string; anomalyKey?: string }) => {
       if (!message.command) {
+        return;
+      }
+
+      if (message.command === 'testAnalysisAgent.selectRootCausePrompt') {
+        void vscode.commands.executeCommand(message.command, message.anomalyKey);
         return;
       }
 
@@ -68,8 +74,20 @@ export class TestAnalysisControlPanelProvider implements vscode.WebviewViewProvi
       : 'Phase 1 has not been run yet';
     const rootCauseSummary =
       state.rootCauses.length > 0
-        ? `${state.rootCauses.length} AI results available`
+        ? `${state.rootCauses.length} Continue packets available`
         : 'Root cause analysis has not been run yet';
+    const selectedRootCause =
+      state.rootCauses.find((item) => item.anomalyKey === state.selectedRootCauseKey) ?? state.rootCauses[0];
+    const promptPreview = selectedRootCause?.continuePrompt ?? '';
+    const promptListHtml =
+      state.rootCauses.length > 0
+        ? state.rootCauses
+            .map((result) => {
+              const selected = result.anomalyKey === selectedRootCause?.anomalyKey;
+              return `<button class="prompt-chip${selected ? ' selected' : ''}" data-command="testAnalysisAgent.selectRootCausePrompt" data-anomaly-key="${escapeHtml(result.anomalyKey)}">${escapeHtml(result.finalOutput.issue_fields.step)} · ${escapeHtml(result.finalOutput.issue_fields.class)}.${escapeHtml(result.finalOutput.issue_fields.method)}</button>`;
+            })
+            .join('')
+        : '<p>No Continue packet prepared yet.</p>';
 
     webview.html = `<!DOCTYPE html>
 <html lang="en">
@@ -217,6 +235,52 @@ export class TestAnalysisControlPanelProvider implements vscode.WebviewViewProvi
       padding: 3px 8px;
       margin-top: 10px;
     }
+
+    .prompt-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 12px 0;
+    }
+
+    .prompt-chip {
+      width: auto;
+      text-align: left;
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--button) 28%, transparent);
+      border: 1px solid color-mix(in srgb, var(--button) 45%, var(--border));
+      color: var(--fg);
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .prompt-chip.selected {
+      background: color-mix(in srgb, var(--button) 78%, transparent);
+      color: var(--buttonFg);
+    }
+
+    .prompt-actions {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    pre {
+      margin: 0;
+      padding: 12px;
+      border-radius: 8px;
+      background: color-mix(in srgb, var(--panel) 84%, black 16%);
+      border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+      color: var(--fg);
+      overflow: auto;
+      max-height: 320px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      line-height: 1.45;
+      font-family: var(--vscode-editor-font-family, var(--vscode-font-family));
+      font-size: 12px;
+    }
   </style>
 </head>
 <body>
@@ -271,6 +335,20 @@ export class TestAnalysisControlPanelProvider implements vscode.WebviewViewProvi
         </div>
       </div>
     </section>
+
+    <section class="card">
+      <div class="eyebrow">Continue Packet</div>
+      <p>Prepared investigation input stays here after analysis. Select a packet, then copy it into Continue chat.</p>
+      <div class="prompt-list">${promptListHtml}</div>
+      <div class="prompt-actions">
+        ${this.buttonHtml(
+          'Copy Selected Continue Prompt',
+          'testAnalysisAgent.copyContinuePrompt',
+          !selectedRootCause
+        )}
+      </div>
+      <pre>${escapeHtml(promptPreview || 'No Continue prompt selected yet.')}</pre>
+    </section>
   </div>
 
   <script nonce="${nonce}">
@@ -280,7 +358,7 @@ export class TestAnalysisControlPanelProvider implements vscode.WebviewViewProvi
         if (button.disabled) {
           return;
         }
-        vscode.postMessage({ command: button.dataset.command });
+        vscode.postMessage({ command: button.dataset.command, anomalyKey: button.dataset.anomalyKey });
       });
     });
   </script>

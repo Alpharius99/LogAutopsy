@@ -8,10 +8,12 @@ class SidebarItem extends vscode.TreeItem {
     label: string,
     collapsibleState: vscode.TreeItemCollapsibleState,
     readonly children: SidebarItem[] = [],
-    description?: string
+    description?: string,
+    command?: vscode.Command
   ) {
     super(label, collapsibleState);
     this.description = description;
+    this.command = command;
   }
 }
 
@@ -126,7 +128,12 @@ export class LogAutopsySidebarProvider implements vscode.TreeDataProvider<Sideba
                 result.finalOutput.root_cause,
                 vscode.TreeItemCollapsibleState.None,
                 [],
-                `${result.finalOutput.issue_fields.step} • ${result.finalOutput.confidence.toFixed(2)}`
+                `${result.finalOutput.issue_fields.step} • ${result.finalOutput.confidence.toFixed(2)}`,
+                {
+                  command: 'testAnalysisAgent.selectRootCausePrompt',
+                  title: 'Select Continue Prompt',
+                  arguments: [result.anomalyKey],
+                }
               )
           )
         )

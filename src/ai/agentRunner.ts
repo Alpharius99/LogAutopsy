@@ -9,12 +9,16 @@ import type {
   Phase1Result,
   RootCauseAnalysis,
 } from '../models/types';
+import { formatDiagnosticError, getDiagnosticsChannel, summarizeDiagnosticError } from '../utils/diagnostics';
 import { ensureBoolean, ensureNumber, ensureObject, ensureString, parseStrictJson } from '../utils/json';
 
 type WorkflowPayload = Record<string, unknown>;
 type JsonValidator<T> = (value: unknown) => T;
 
 const MAX_METHOD_LINES = 300;
+const MAX_CODE_CANDIDATES = 3;
+const RAW_RESPONSE_PREVIEW_LENGTH = 500;
+const DIAGNOSTIC_SUMMARY_PREFIX = 'Diagnostic: ';
 
 function simpleClassName(name: string): string {
   return name.split('.').at(-1) ?? name;
@@ -32,25 +36,36 @@ function symbolKindRank(kind: vscode.SymbolKind): number {
   return 1;
 }
 
-async function resolveCodeCandidate(anomaly: AggregatedAnomaly): Promise<CodeCandidate | undefined> {
+async function resolveCodeCandidates(anomaly: AggregatedAnomaly): Promise<CodeCandidate[]> {
   const classQuery = simpleClassName(anomaly.sourceHint.class);
+  const methodQuery = anomaly.sourceHint.method;
   const symbols =
     (await vscode.commands.executeCommand<vscode.SymbolInformation[]>(
       'vscode.executeWorkspaceSymbolProvider',
-      classQuery
+      `${classQuery} ${methodQuery}`
     )) ?? [];
+  const fallbackSymbols =
+    symbols.length > 0
+      ? symbols
+      : ((await vscode.commands.executeCommand<vscode.SymbolInformation[]>(
+          'vscode.executeWorkspaceSymbolProvider',
+          classQuery
+        )) ?? []);
 
-  const ranked = symbols
+  const ranked = fallbackSymbols
     .filter((symbol) => symbol.location.uri.fsPath.endsWith('.cs'))
     .map((symbol) => {
       const symbolName = symbol.name;
       const container = symbol.containerName ?? '';
+      const fileName = path.basename(symbol.location.uri.fsPath, path.extname(symbol.location.uri.fsPath));
       const classExact =
         symbolName === classQuery ||
         container === classQuery ||
-        container.endsWith(`.${classQuery}`);
+        container.endsWith(`.${classQuery}`) ||
+        fileName === classQuery;
       const methodExact =
-        symbolName === anomaly.sourceHint.method || symbolName.endsWith(`.${anomaly.sourceHint.method}`);
+        symbolName === methodQuery || symbolName.endsWith(`.${methodQuery}`);
+      const lineDistance = Math.abs(symbol.location.range.start.line + 1 - anomaly.sourceHint.line);
 
       let confidence = 0.0;
       if (classExact && methodExact) {
@@ -65,22 +80,36 @@ async function resolveCodeCandidate(anomaly: AggregatedAnomaly): Promise<CodeCan
         symbol,
         confidence,
         weight: symbolKindRank(symbol.kind),
+        lineDistance,
       };
     })
     .filter((item) => item.confidence > 0)
-    .sort((left, right) => right.confidence - left.confidence || right.weight - left.weight);
+    .sort(
+      (left, right) =>
+        right.confidence - left.confidence ||
+        right.weight - left.weight ||
+        left.lineDistance - right.lineDistance
+    );
 
+  const candidates: CodeCandidate[] = [];
   for (const item of ranked) {
     const method = await extractMethodCandidate(item.symbol.location.uri, anomaly.sourceHint.method, classQuery);
     if (method) {
-      return {
+      const candidate = {
         ...method,
         confidence: item.confidence,
       };
+      if (!candidates.some((existing) => existing.filePath === candidate.filePath && existing.startLine === candidate.startLine)) {
+        candidates.push(candidate);
+      }
+    }
+
+    if (candidates.length >= MAX_CODE_CANDIDATES) {
+      break;
     }
   }
 
-  return undefined;
+  return candidates;
 }
 
 function flattenDocumentSymbols(
@@ -147,6 +176,15 @@ function promptEnvelope(step: string, payload: unknown, responseSchema: unknown)
   );
 }
 
+function previewText(value: string, maxLength = RAW_RESPONSE_PREVIEW_LENGTH): string {
+  const normalized = value.replace(/\s+/g, ' ').trim();
+  if (normalized.length <= maxLength) {
+    return normalized;
+  }
+
+  return `${normalized.slice(0, maxLength - 1)}…`;
+}
+
 async function runJsonStep<T>(
   step: string,
   payload: unknown,
@@ -155,13 +193,24 @@ async function runJsonStep<T>(
   temperature: number,
   token: vscode.CancellationToken
 ): Promise<T> {
+  const diagnostics = getDiagnosticsChannel();
+  diagnostics.info(`Running AI workflow step "${step}".`);
+
   const raw = await analyzeWithContinue(promptEnvelope(step, payload, responseSchema), {
     systemPrompt: defaultContinueSystemPrompt(),
     temperature,
     token,
   });
+  diagnostics.info(`Step "${step}" raw response preview: ${previewText(raw)}`);
 
-  return validate(parseStrictJson(raw));
+  try {
+    return validate(parseStrictJson(raw));
+  } catch (error) {
+    diagnostics.error(
+      `Step "${step}" returned invalid JSON or schema.\nRaw response:\n${raw}\n\n${formatDiagnosticError(error)}`
+    );
+    throw new Error(`${step} failed: ${summarizeDiagnosticError(error)}`);
+  }
 }
 
 function ensureStringArray(value: unknown, label: string): string[] {
@@ -290,10 +339,146 @@ function summarizeAnomaly(anomaly: AggregatedAnomaly): Record<string, unknown> {
   };
 }
 
-function fallbackRootCause(anomaly: AggregatedAnomaly, candidate?: CodeCandidate): FinalAiOutput {
-  const fileName = candidate ? path.basename(candidate.filePath) : '';
+function formatCodeCandidate(candidate: CodeCandidate): string {
+  return [
+    `File: ${candidate.filePath}`,
+    `Class: ${candidate.className}`,
+    `Method: ${candidate.methodName}`,
+    `Lines: ${candidate.startLine}-${candidate.endLine}`,
+    `Confidence: ${candidate.confidence.toFixed(2)}`,
+    'Code:',
+    '```csharp',
+    candidate.methodBody,
+    '```',
+  ].join('\n');
+}
+
+function buildContinuePrompt(
+  anomaly: AggregatedAnomaly,
+  phase1: Phase1Result,
+  candidates: CodeCandidate[]
+): string {
+  const relatedAnomalies = phase1.aggregated
+    .filter((item) => item.key !== anomaly.key)
+    .slice(0, 5)
+    .map(
+      (item, index) =>
+        [
+          `${index + 1}. ${item.message}`,
+          `   Step: ${item.step}`,
+          `   Source hint: ${item.sourceHint.class}.${item.sourceHint.method}:${item.sourceHint.line}`,
+          `   Top stack frame: ${item.topStackFrame}`,
+        ].join('\n')
+    )
+    .join('\n');
+
+  const candidateSection =
+    candidates.length > 0
+      ? candidates.map((candidate, index) => `### Candidate ${index + 1}\n${formatCodeCandidate(candidate)}`).join('\n\n')
+      : [
+          'No matching C# method was resolved automatically.',
+          'Use the source hint and stack trace to locate the implementation in the workspace:',
+          `${anomaly.sourceHint.class}.${anomaly.sourceHint.method}:${anomaly.sourceHint.line}`,
+        ].join('\n');
+
+  const stackTrace = anomaly.stacktrace?.trim() || 'No stack trace captured.';
+
+  return [
+    'You are investigating a failed automated test run.',
+    'Use the workspace codebase, especially the candidate C# files below, to determine the primary root cause.',
+    'Distinguish the first real failure from downstream side effects.',
+    'Read the referenced classes and any directly related callees before deciding.',
+    '',
+    'Return your answer in Markdown with these sections exactly:',
+    '1. Summary',
+    '2. Primary Root Cause',
+    '3. Evidence',
+    '4. Fix Suggestion',
+    '5. Open Questions',
+    '',
+    '## Artifact',
+    `Name: ${phase1.artifact.name}`,
+    `Log: ${vscode.Uri.parse(phase1.artifact.logUri).fsPath}`,
+    phase1.artifact.featureUri ? `Feature: ${vscode.Uri.parse(phase1.artifact.featureUri).fsPath}` : 'Feature: none',
+    '',
+    '## Primary Anomaly',
+    `Key: ${anomaly.key}`,
+    `Type: ${anomaly.type}`,
+    `Step: ${anomaly.step}`,
+    `Phase: ${anomaly.phase}`,
+    `Occurrences: ${anomaly.occurrences}`,
+    `Timestamp: ${anomaly.firstOccurrence.timestamp}`,
+    `Message: ${anomaly.message}`,
+    `Top stack frame: ${anomaly.topStackFrame}`,
+    `Source hint: ${anomaly.sourceHint.class}.${anomaly.sourceHint.method}:${anomaly.sourceHint.line}`,
+    '',
+    '## Stack Trace',
+    '```text',
+    stackTrace,
+    '```',
+    '',
+    '## Related Anomalies',
+    relatedAnomalies || 'None',
+    '',
+    '## Candidate Code Locations',
+    candidateSection,
+    '',
+    '## Task',
+    'Inspect the codebase and explain which code path most likely caused the failure, why it failed, what evidence supports that, and what change is most likely required.',
+  ].join('\n');
+}
+
+function manualRootCauseResult(
+  anomaly: AggregatedAnomaly,
+  phase1: Phase1Result,
+  candidates: CodeCandidate[]
+): RootCauseAnalysis {
+  const resolvedTarget = candidates[0];
+  const continuePrompt = buildContinuePrompt(anomaly, phase1, candidates);
+
   return {
-    root_cause: `Unable to obtain AI diagnosis for ${anomaly.sourceHint.class}.${anomaly.sourceHint.method}`,
+    anomalyKey: anomaly.key,
+    aggregatedAnomaly: anomaly,
+    resolvedTarget,
+    candidateTargets: candidates,
+    workflow: {
+      extract_context: {},
+      identify_failure_point: {},
+      analyze_code: {},
+      correlate_logs: {},
+      validate_hypothesis: {},
+    },
+    finalOutput: {
+      root_cause: `Continue prompt prepared for ${anomaly.sourceHint.class}.${anomaly.sourceHint.method}`,
+      hypothesis: {
+        cause: anomaly.message,
+        mechanism: anomaly.topStackFrame,
+        trigger: `Failure occurred during step ${anomaly.step}`,
+      },
+      fix_suggestion: 'Paste the prepared prompt into Continue chat and let it inspect the referenced code.',
+      confidence: resolvedTarget?.confidence ?? 0,
+      issue_description: continuePrompt,
+      issue_fields: {
+        step: anomaly.step,
+        class: anomaly.sourceHint.class,
+        method: anomaly.sourceHint.method,
+        file: resolvedTarget?.filePath ?? '',
+        line: resolvedTarget?.startLine ?? anomaly.sourceHint.line,
+      },
+    },
+    continuePrompt,
+  };
+}
+
+function fallbackRootCause(
+  anomaly: AggregatedAnomaly,
+  diagnosticSummary?: string,
+  candidate?: CodeCandidate
+): FinalAiOutput {
+  const fileName = candidate ? path.basename(candidate.filePath) : '';
+  const diagnosticSuffix = diagnosticSummary ? ` (${diagnosticSummary})` : '';
+  return {
+    root_cause: `Unable to obtain AI diagnosis for ${anomaly.sourceHint.class}.${anomaly.sourceHint.method}${diagnosticSuffix}`,
     hypothesis: {
       cause: anomaly.message,
       mechanism: anomaly.topStackFrame,
@@ -320,6 +505,8 @@ function fallbackRootCause(anomaly: AggregatedAnomaly, candidate?: CodeCandidate
       '## Evidence',
       `Source hint: ${anomaly.sourceHint.class}.${anomaly.sourceHint.method}:${anomaly.sourceHint.line}`,
       fileName ? `Resolved file: ${fileName}` : 'No source file resolved.',
+      diagnosticSummary ? `${DIAGNOSTIC_SUMMARY_PREFIX}${diagnosticSummary}` : 'Diagnostic: unavailable',
+      'See the "Test Analysis Agent Diagnostics" output channel for full AI workflow details.',
     ].join('\n'),
     issue_fields: {
       step: anomaly.step,
@@ -336,7 +523,19 @@ async function analyzeAnomaly(
   phase1: Phase1Result,
   token: vscode.CancellationToken
 ): Promise<RootCauseAnalysis> {
-  const candidate = await resolveCodeCandidate(anomaly);
+  const diagnostics = getDiagnosticsChannel();
+  const candidates = await resolveCodeCandidates(anomaly);
+  const candidate = candidates[0];
+  diagnostics.info(
+    [
+      `Starting root cause analysis for anomaly "${anomaly.key}".`,
+      `Step=${anomaly.step}`,
+      `SourceHint=${anomaly.sourceHint.class}.${anomaly.sourceHint.method}:${anomaly.sourceHint.line}`,
+      candidate
+        ? `ResolvedTarget=${candidate.filePath}:${candidate.startLine}-${candidate.endLine} (confidence ${candidate.confidence.toFixed(2)})`
+        : 'ResolvedTarget=none',
+    ].join(' | ')
+  );
   const contextPayload = {
     anomaly: summarizeAnomaly(anomaly),
     code_context: candidate
@@ -510,6 +709,7 @@ async function analyzeAnomaly(
       anomalyKey: anomaly.key,
       aggregatedAnomaly: anomaly,
       resolvedTarget: candidate,
+      candidateTargets: candidates,
       workflow: {
         extract_context: extractContext,
         identify_failure_point: identifyFailurePoint,
@@ -519,11 +719,16 @@ async function analyzeAnomaly(
       },
       finalOutput: finalOutputPayload,
     };
-  } catch {
+  } catch (error) {
+    const diagnosticSummary = summarizeDiagnosticError(error);
+    diagnostics.error(
+      `Root cause analysis failed for anomaly "${anomaly.key}".\n${formatDiagnosticError(error)}`
+    );
     return {
       anomalyKey: anomaly.key,
       aggregatedAnomaly: anomaly,
       resolvedTarget: candidate,
+      candidateTargets: candidates,
       workflow: {
         extract_context: {},
         identify_failure_point: {},
@@ -531,7 +736,7 @@ async function analyzeAnomaly(
         correlate_logs: {},
         validate_hypothesis: {},
       },
-      finalOutput: fallbackRootCause(anomaly, candidate),
+      finalOutput: fallbackRootCause(anomaly, diagnosticSummary, candidate),
     };
   }
 }
@@ -551,10 +756,14 @@ export async function runRootCauseAnalysis(
 
     const anomaly = phase1.aggregated[index];
     progress.report({
-      message: `Analyzing ${index + 1}/${phase1.aggregated.length}: ${anomaly.step}`,
+      message: `Preparing Continue prompt ${index + 1}/${phase1.aggregated.length}: ${anomaly.step}`,
       increment: 100 / total,
     });
-    results.push(await analyzeAnomaly(anomaly, phase1, token));
+    const candidates = await resolveCodeCandidates(anomaly);
+    getDiagnosticsChannel().info(
+      `Prepared Continue prompt for anomaly "${anomaly.key}" with ${candidates.length} code candidate(s).`
+    );
+    results.push(manualRootCauseResult(anomaly, phase1, candidates));
   }
 
   return results;

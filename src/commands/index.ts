@@ -8,7 +8,17 @@ import { createGitLabIssue } from '../gitlab/gitlabClient';
 import { buildIssueCandidate } from '../gitlab/issueBuilder';
 import { AnalysisStore } from '../utils/analysisStore';
 import { pickArtifacts, pickLogOnlyArtifact, readUriText } from '../utils/artifacts';
+import {
+  formatDiagnosticError,
+  getLastDiagnosticMessage,
+  revealDiagnosticsChannel,
+  setLastDiagnosticMessage,
+} from '../utils/diagnostics';
 import type { Phase1Result, RootCauseAnalysis } from '../models/types';
+
+const SHOW_DIAGNOSTICS_ACTION = 'Show Diagnostics';
+const COPY_DIAGNOSTIC_ACTION = 'Copy Diagnostic';
+const COPY_CONTINUE_PROMPT_ACTION = 'Copy Continue Prompt';
 
 async function ensureArtifact(store: AnalysisStore) {
   const state = store.getState();
@@ -62,10 +72,77 @@ async function selectRootCause(rootCauses: RootCauseAnalysis[]): Promise<RootCau
   return picked?.result;
 }
 
+async function copyContinuePrompt(result: RootCauseAnalysis): Promise<void> {
+  const prompt = result.continuePrompt ?? result.finalOutput.issue_description;
+  await vscode.env.clipboard.writeText(prompt);
+  await vscode.commands.executeCommand('continue.focusContinueInputWithoutClear');
+  vscode.window.showInformationMessage('Continue analysis prompt copied to clipboard and Continue chat focused.');
+}
+
+async function handleCommandError(error: unknown): Promise<void> {
+  const message = formatDiagnosticError(error);
+  setLastDiagnosticMessage(message);
+  const choice = await vscode.window.showErrorMessage(
+    message,
+    SHOW_DIAGNOSTICS_ACTION,
+    COPY_DIAGNOSTIC_ACTION
+  );
+
+  if (choice === SHOW_DIAGNOSTICS_ACTION) {
+    revealDiagnosticsChannel();
+  } else if (choice === COPY_DIAGNOSTIC_ACTION) {
+    await vscode.env.clipboard.writeText(message);
+    vscode.window.showInformationMessage('Diagnostic message copied to clipboard.');
+  }
+}
+
 export function registerCommands(
   context: vscode.ExtensionContext,
   store: AnalysisStore
 ): void {
+  context.subscriptions.push(
+    vscode.commands.registerCommand('testAnalysisAgent.showDiagnostics', () => {
+      revealDiagnosticsChannel();
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('testAnalysisAgent.copyLastDiagnosticMessage', async () => {
+      const message = getLastDiagnosticMessage();
+      if (!message) {
+        vscode.window.showInformationMessage('No diagnostic message has been captured yet.');
+        return;
+      }
+
+      await vscode.env.clipboard.writeText(message);
+      vscode.window.showInformationMessage('Diagnostic message copied to clipboard.');
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('testAnalysisAgent.copyContinuePrompt', async () => {
+      const state = store.getState();
+      if (state.rootCauses.length === 0) {
+        throw new Error('Run root cause analysis first to prepare a Continue prompt.');
+      }
+
+      const selected =
+        state.rootCauses.find((item) => item.anomalyKey === state.selectedRootCauseKey) ??
+        (await selectRootCause(state.rootCauses));
+      if (!selected) {
+        return;
+      }
+
+      await copyContinuePrompt(selected);
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('testAnalysisAgent.selectRootCausePrompt', (anomalyKey?: string) => {
+      store.setSelectedRootCause(anomalyKey);
+    })
+  );
+
   context.subscriptions.push(
     vscode.commands.registerCommand('testAnalysisAgent.loadTestArtifacts', async () => {
       try {
@@ -77,7 +154,7 @@ export function registerCommands(
         store.setArtifact(artifact);
         vscode.window.showInformationMessage(`Loaded artifacts for ${artifact.name}.`);
       } catch (error) {
-        vscode.window.showErrorMessage((error as Error).message);
+        void handleCommandError(error);
       }
     })
   );
@@ -93,7 +170,7 @@ export function registerCommands(
         store.setArtifact(artifact);
         vscode.window.showInformationMessage(`Loaded log-only analysis input for ${artifact.name}.`);
       } catch (error) {
-        vscode.window.showErrorMessage((error as Error).message);
+        void handleCommandError(error);
       }
     })
   );
@@ -119,7 +196,7 @@ export function registerCommands(
           `Phase 1 complete: ${phase1.aggregated.length} grouped anomalies across ${phase1.steps.length} steps.`
         );
       } catch (error) {
-        vscode.window.showErrorMessage((error as Error).message);
+        void handleCommandError(error);
       }
     })
   );
@@ -136,16 +213,30 @@ export function registerCommands(
         const results = await vscode.window.withProgress(
           {
             location: vscode.ProgressLocation.Notification,
-            title: 'Running AI root cause analysis',
+            title: 'Preparing Continue investigation prompts',
             cancellable: true,
           },
           (progress, token) => runAiRootCauseAnalysis(phase1, progress, token)
         );
 
         store.setRootCauses(results);
-        vscode.window.showInformationMessage(`Root cause analysis complete for ${results.length} anomalies.`);
+        const action = await vscode.window.showInformationMessage(
+          `Prepared Continue prompts for ${results.length} anomalies.`,
+          COPY_CONTINUE_PROMPT_ACTION
+        );
+        if (action === COPY_CONTINUE_PROMPT_ACTION && results.length > 0) {
+          const selected =
+            results.length === 1
+              ? results[0]
+              : (results.find((item) => item.anomalyKey === store.getState().selectedRootCauseKey) ??
+                (await selectRootCause(results)));
+          if (selected) {
+            store.setSelectedRootCause(selected.anomalyKey);
+            await copyContinuePrompt(selected);
+          }
+        }
       } catch (error) {
-        vscode.window.showErrorMessage((error as Error).message);
+        void handleCommandError(error);
       }
     })
   );
@@ -190,7 +281,7 @@ export function registerCommands(
           }
         });
       } catch (error) {
-        vscode.window.showErrorMessage((error as Error).message);
+        void handleCommandError(error);
       }
     })
   );
