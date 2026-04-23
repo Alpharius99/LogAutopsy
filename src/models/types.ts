@@ -9,7 +9,7 @@ export type KeywordType = 'Action' | 'Conjunction' | 'Outcome';
 export interface ArtifactPair {
   name: string;
   logUri: string;
-  featureUri: string;
+  featureUri?: string;
 }
 
 export interface LogEvent {

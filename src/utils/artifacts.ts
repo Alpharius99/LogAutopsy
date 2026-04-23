@@ -27,6 +27,10 @@ function isCombinedLog(filePath: string): boolean {
   return /_\d{6}_\d{6}\.log$/i.test(filePath) && !/[\\/](Precondition|TestCase|PostCondition)[\\/]/i.test(filePath);
 }
 
+function isLogFile(filePath: string): boolean {
+  return /\.log$/i.test(filePath);
+}
+
 export async function discoverArtifactPairs(root: vscode.Uri): Promise<ArtifactPair[]> {
   const files: vscode.Uri[] = [];
   await walk(root, files);
@@ -46,11 +50,11 @@ export async function discoverArtifactPairs(root: vscode.Uri): Promise<ArtifactP
   }
 
   return [...byDirectory.entries()]
-    .filter(([, bucket]) => bucket.logUri && bucket.featureUri)
+    .filter(([, bucket]) => bucket.logUri)
     .map(([dir, bucket]) => ({
       name: path.basename(dir),
       logUri: bucket.logUri!.toString(),
-      featureUri: bucket.featureUri!.toString(),
+      featureUri: bucket.featureUri?.toString(),
     }))
     .sort((left, right) => left.name.localeCompare(right.name));
 }
@@ -70,7 +74,7 @@ export async function pickArtifacts(): Promise<ArtifactPair | undefined> {
 
   const pairs = await discoverArtifactPairs(root);
   if (pairs.length === 0) {
-    throw new Error('No combined log + feature pairs were found in the selected folder.');
+    throw new Error('No combined log files were found in the selected folder.');
   }
 
   if (pairs.length === 1) {
@@ -80,7 +84,9 @@ export async function pickArtifacts(): Promise<ArtifactPair | undefined> {
   const picked = await vscode.window.showQuickPick(
     pairs.map((pair) => ({
       label: pair.name,
-      description: vscode.Uri.parse(pair.logUri).fsPath,
+      description: pair.featureUri
+        ? `${vscode.Uri.parse(pair.logUri).fsPath} • feature detected`
+        : `${vscode.Uri.parse(pair.logUri).fsPath} • log only`,
       pair,
     })),
     {
@@ -89,6 +95,32 @@ export async function pickArtifacts(): Promise<ArtifactPair | undefined> {
   );
 
   return picked?.pair;
+}
+
+export async function pickLogOnlyArtifact(): Promise<ArtifactPair | undefined> {
+  const selection = await vscode.window.showOpenDialog({
+    canSelectFiles: true,
+    canSelectFolders: false,
+    canSelectMany: false,
+    filters: {
+      Logs: ['log'],
+    },
+    openLabel: 'Load Log Only',
+  });
+
+  const logFile = selection?.[0];
+  if (!logFile) {
+    return undefined;
+  }
+
+  if (!isLogFile(logFile.fsPath)) {
+    throw new Error('Selected file is not a supported log file.');
+  }
+
+  return {
+    name: path.basename(logFile.fsPath, path.extname(logFile.fsPath)),
+    logUri: logFile.toString(),
+  };
 }
 
 export async function readUriText(uri: string): Promise<string> {

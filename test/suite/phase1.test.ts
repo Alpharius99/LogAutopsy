@@ -53,4 +53,23 @@ suite('Phase 1 deterministic pipeline', () => {
     assert.strictEqual(aggregated[0].step, 'RunCheck');
     assert.strictEqual(aggregated[0].sourceHint.method, 'WaitForTask');
   });
+
+  test('builds step contexts from the log when no feature file is available', () => {
+    const events = parseLog(log);
+    const steps = buildStepContexts(events, '');
+    const anomalies = detectAnomalies(events, steps, '/tmp/sample.log');
+    const aggregated = aggregateAnomalies(anomalies);
+
+    assert.strictEqual(steps.length, 3);
+    assert.strictEqual(steps[0].step === '_init_', false);
+    assert.strictEqual(steps[0].step === '_init_' ? '' : steps[0].step.name, 'BootSystem');
+    assert.strictEqual(steps[0].phase, 'TestCase');
+    assert.strictEqual(steps[1].step === '_init_' ? '' : steps[1].step.name, 'RunCheck');
+    assert.strictEqual(steps[1].result, 'TestRunError');
+
+    assert.strictEqual(anomalies.length, 1);
+    assert.strictEqual(anomalies[0].step, 'RunCheck');
+    assert.strictEqual(aggregated.length, 1);
+    assert.strictEqual(aggregated[0].step, 'RunCheck');
+  });
 });

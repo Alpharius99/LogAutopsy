@@ -3,6 +3,7 @@ import type { AnalysisStore } from '../utils/analysisStore';
 
 type ControlCommand =
   | 'testAnalysisAgent.loadTestArtifacts'
+  | 'testAnalysisAgent.loadLogOnly'
   | 'testAnalysisAgent.runPhase1Analysis'
   | 'testAnalysisAgent.runRootCauseAnalysis'
   | 'testAnalysisAgent.createGitLabIssues';
@@ -52,7 +53,16 @@ export class TestAnalysisControlPanelProvider implements vscode.WebviewViewProvi
     const webview = this.view.webview;
     const state = this.store.getState();
     const nonce = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
-    const artifactName = state.artifact?.name ?? 'No artifacts loaded';
+    const artifactName = state.artifact
+      ? state.artifact.featureUri
+        ? `${state.artifact.name} (log + feature)`
+        : `${state.artifact.name} (log only)`
+      : 'No artifacts loaded';
+    const inputMode = state.artifact
+      ? state.artifact.featureUri
+        ? 'Full input'
+        : 'Lite input'
+      : 'No input selected';
     const phase1Summary = state.phase1
       ? `${state.phase1.aggregated.length} grouped anomalies across ${state.phase1.steps.length} steps`
       : 'Phase 1 has not been run yet';
@@ -161,6 +171,12 @@ export class TestAnalysisControlPanelProvider implements vscode.WebviewViewProvi
       margin-top: 12px;
     }
 
+    .button-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
     button {
       width: 100%;
       border: none;
@@ -208,10 +224,13 @@ export class TestAnalysisControlPanelProvider implements vscode.WebviewViewProvi
     <section class="card">
       <div class="eyebrow">Test Analysis Agent</div>
       <h2>Control Panel</h2>
-      <p>Run the pipeline in order, then create a GitLab issue from the analyzed result set.</p>
-      <div class="pill">${escapeHtml(state.artifact ? 'Artifact loaded' : 'Waiting for artifacts')}</div>
+      <p>Choose full input for log + feature discovery, or lite input when the log file is enough.</p>
+      <div class="pill">${escapeHtml(state.artifact ? inputMode : 'Waiting for input')}</div>
       <div class="button-list">
-        ${this.buttonHtml('Load Test Artifacts', 'testAnalysisAgent.loadTestArtifacts')}
+        <div class="button-row">
+          ${this.buttonHtml('Load Full Input', 'testAnalysisAgent.loadTestArtifacts')}
+          ${this.buttonHtml('Load Log Only', 'testAnalysisAgent.loadLogOnly', false, 'secondary')}
+        </div>
         ${this.buttonHtml(
           'Run Phase 1 Analysis',
           'testAnalysisAgent.runPhase1Analysis',
@@ -234,6 +253,10 @@ export class TestAnalysisControlPanelProvider implements vscode.WebviewViewProvi
     <section class="card">
       <div class="eyebrow">Current State</div>
       <div class="status-grid">
+        <div class="status-row">
+          <div class="status-label">Input Mode</div>
+          <div class="status-value">${escapeHtml(inputMode)}</div>
+        </div>
         <div class="status-row">
           <div class="status-label">Artifact</div>
           <div class="status-value">${escapeHtml(artifactName)}</div>

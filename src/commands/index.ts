@@ -7,7 +7,7 @@ import { runRootCauseAnalysis as runAiRootCauseAnalysis } from '../ai/agentRunne
 import { createGitLabIssue } from '../gitlab/gitlabClient';
 import { buildIssueCandidate } from '../gitlab/issueBuilder';
 import { AnalysisStore } from '../utils/analysisStore';
-import { pickArtifacts, readUriText } from '../utils/artifacts';
+import { pickArtifacts, pickLogOnlyArtifact, readUriText } from '../utils/artifacts';
 import type { Phase1Result, RootCauseAnalysis } from '../models/types';
 
 async function ensureArtifact(store: AnalysisStore) {
@@ -32,7 +32,7 @@ async function buildPhase1Result(store: AnalysisStore): Promise<Phase1Result | u
   }
 
   const logContent = await readUriText(artifact.logUri);
-  const featureContent = await readUriText(artifact.featureUri);
+  const featureContent = artifact.featureUri ? await readUriText(artifact.featureUri) : '';
   const events = parseLog(logContent);
   const steps = buildStepContexts(events, featureContent);
   const anomalies = detectAnomalies(events, steps, vscode.Uri.parse(artifact.logUri).fsPath);
@@ -76,6 +76,22 @@ export function registerCommands(
 
         store.setArtifact(artifact);
         vscode.window.showInformationMessage(`Loaded artifacts for ${artifact.name}.`);
+      } catch (error) {
+        vscode.window.showErrorMessage((error as Error).message);
+      }
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('testAnalysisAgent.loadLogOnly', async () => {
+      try {
+        const artifact = await pickLogOnlyArtifact();
+        if (!artifact) {
+          return;
+        }
+
+        store.setArtifact(artifact);
+        vscode.window.showInformationMessage(`Loaded log-only analysis input for ${artifact.name}.`);
       } catch (error) {
         vscode.window.showErrorMessage((error as Error).message);
       }

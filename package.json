@@ -22,6 +22,7 @@
   ],
   "activationEvents": [
     "onCommand:testAnalysisAgent.loadTestArtifacts",
+    "onCommand:testAnalysisAgent.loadLogOnly",
     "onCommand:testAnalysisAgent.runPhase1Analysis",
     "onCommand:testAnalysisAgent.runRootCauseAnalysis",
     "onCommand:testAnalysisAgent.createGitLabIssues",
@@ -33,7 +34,12 @@
     "commands": [
       {
         "command": "testAnalysisAgent.loadTestArtifacts",
-        "title": "Load Test Artifacts",
+        "title": "Load Full Input",
+        "category": "Test Analysis Agent"
+      },
+      {
+        "command": "testAnalysisAgent.loadLogOnly",
+        "title": "Load Log Only",
         "category": "Test Analysis Agent"
       },
       {
@@ -78,33 +84,9 @@
       {
         "view": "testAnalysisAgent.sidebar",
         "when": "true",
-        "contents": "No analysis results yet.\n[Load Test Artifacts](command:testAnalysisAgent.loadTestArtifacts)\n\nRun the deterministic pipeline first.\n[Run Phase 1 Analysis](command:testAnalysisAgent.runPhase1Analysis)\n\nThen run the AI workflow.\n[Run Root Cause Analysis](command:testAnalysisAgent.runRootCauseAnalysis)\n\nCreate issues after reviewing the results.\n[Create GitLab Issues](command:testAnalysisAgent.createGitLabIssues)"
+        "contents": "No analysis results yet.\n[Load Full Input](command:testAnalysisAgent.loadTestArtifacts)\n[Load Log Only](command:testAnalysisAgent.loadLogOnly)\n\nRun the deterministic pipeline first.\n[Run Phase 1 Analysis](command:testAnalysisAgent.runPhase1Analysis)\n\nThen run the AI workflow.\n[Run Root Cause Analysis](command:testAnalysisAgent.runRootCauseAnalysis)\n\nCreate issues after reviewing the results.\n[Create GitLab Issues](command:testAnalysisAgent.createGitLabIssues)"
       }
     ],
-    "menus": {
-      "view/title": [
-        {
-          "command": "testAnalysisAgent.loadTestArtifacts",
-          "when": "view == testAnalysisAgent.controls || view == testAnalysisAgent.sidebar",
-          "group": "navigation@1"
-        },
-        {
-          "command": "testAnalysisAgent.runPhase1Analysis",
-          "when": "view == testAnalysisAgent.controls || view == testAnalysisAgent.sidebar",
-          "group": "navigation@2"
-        },
-        {
-          "command": "testAnalysisAgent.runRootCauseAnalysis",
-          "when": "view == testAnalysisAgent.controls || view == testAnalysisAgent.sidebar",
-          "group": "navigation@3"
-        },
-        {
-          "command": "testAnalysisAgent.createGitLabIssues",
-          "when": "view == testAnalysisAgent.controls || view == testAnalysisAgent.sidebar",
-          "group": "navigation@4"
-        }
-      ]
-    },
     "configuration": {
       "title": "Test Analysis Agent",
       "properties": {

@@ -15,6 +15,23 @@ class SidebarItem extends vscode.TreeItem {
   }
 }
 
+function compactText(value: string, maxLength = 72): string {
+  const normalized = value.replace(/\s+/g, ' ').trim();
+  if (normalized.length <= maxLength) {
+    return normalized;
+  }
+
+  return `${normalized.slice(0, maxLength - 1)}…`;
+}
+
+function anomalyLabel(message: string): string {
+  const cleaned = message
+    .replace(/^Failed with the message\s+/i, '')
+    .replace(/^['"]|['"]$/g, '');
+
+  return compactText(cleaned);
+}
+
 function buildStepItem(step: StepContext, rootCauses: RootCauseAnalysis[]): SidebarItem {
   const stepName = step.step === '_init_' ? '_init_' : step.step.name;
   const relatedResults = rootCauses.filter((item) => item.aggregatedAnomaly.step === stepName);
@@ -62,10 +79,14 @@ export class LogAutopsySidebarProvider implements vscode.TreeDataProvider<Sideba
 
     const roots: SidebarItem[] = [
       new SidebarItem(
-        state.artifact?.name ?? 'No artifact metadata',
+        'Artifact',
         vscode.TreeItemCollapsibleState.None,
         [],
-        state.artifact ? 'Loaded artifact' : 'Derived from current analysis'
+        state.artifact
+          ? state.artifact.featureUri
+            ? `${compactText(state.artifact.name, 32)} • full`
+            : `${compactText(state.artifact.name, 32)} • lite`
+          : 'Derived from current analysis'
       ),
     ];
 
@@ -84,10 +105,10 @@ export class LogAutopsySidebarProvider implements vscode.TreeDataProvider<Sideba
           state.phase1.aggregated.map(
             (anomaly) =>
               new SidebarItem(
-                anomaly.message,
+                anomalyLabel(anomaly.message),
                 vscode.TreeItemCollapsibleState.None,
                 [],
-                `${anomaly.step} • ${anomaly.occurrences}x`
+                `${anomaly.type} • ${compactText(anomaly.step, 20)} • ${anomaly.occurrences}x`
               )
           )
         )

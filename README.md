@@ -1,6 +1,6 @@
 # test-analysis-agent
 
-`test-analysis-agent` is a VS Code extension for investigating automated test failures from combined log files and Gherkin feature files. It performs deterministic anomaly analysis first, then runs a bounded AI-assisted root cause workflow, and can turn the result into a GitLab issue.
+`test-analysis-agent` is a VS Code extension for investigating automated test failures from combined log files and optional Gherkin feature files. It performs deterministic anomaly analysis first, then runs a bounded AI-assisted root cause workflow, and can turn the result into a GitLab issue.
 
 ## Overview
 
@@ -54,7 +54,7 @@ The results view also shows welcome-style quick actions when no analysis output 
 The engine expects a test case folder containing both:
 
 - one combined log file matching `*_YYMMDD_HHMMSS.log`
-- one `.feature` file in the same folder
+- optionally one `.feature` file in the same folder
 
 Example layout:
 
@@ -83,7 +83,7 @@ Ignored by the engine:
 Inputs:
 
 - combined log
-- Gherkin feature file
+- optional Gherkin feature file
 
 Behavior:
 
@@ -296,4 +296,4 @@ media/
 ## Notes
 
 - Continue integration in this project uses the VS Code language model API path
-- sample artifacts in `examples/` are useful for folder structure reference, but complete end-to-end analysis requires a matching combined log + feature pair
+- sample artifacts in `examples/` are useful for folder structure reference; end-to-end analysis can run from a combined log alone, with richer step/phase mapping when a matching feature file is present
