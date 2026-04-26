@@ -1,5 +1,11 @@
 import * as vscode from 'vscode';
-import type { AnalysisStoreState, ArtifactPair, Phase1Result, RootCauseAnalysis } from '../models/types';
+import type {
+  AnalysisStoreState,
+  ArtifactPair,
+  GeneratedIssueDraft,
+  Phase1Result,
+  RootCauseAnalysis,
+} from '../models/types';
 
 export class AnalysisStore {
   private readonly emitter = new vscode.EventEmitter<void>();
@@ -18,6 +24,7 @@ export class AnalysisStore {
       artifact,
       rootCauses: [],
       selectedRootCauseKey: undefined,
+      generatedIssueDraft: undefined,
     };
     this.emitter.fire();
   }
@@ -28,6 +35,7 @@ export class AnalysisStore {
       phase1,
       rootCauses: [],
       selectedRootCauseKey: undefined,
+      generatedIssueDraft: undefined,
     };
     this.emitter.fire();
   }
@@ -40,6 +48,11 @@ export class AnalysisStore {
       ...this.state,
       rootCauses,
       selectedRootCauseKey,
+      generatedIssueDraft:
+        this.state.generatedIssueDraft &&
+        rootCauses.some((item) => item.anomalyKey === this.state.generatedIssueDraft?.anomalyKey)
+          ? this.state.generatedIssueDraft
+          : undefined,
     };
     this.emitter.fire();
   }
@@ -48,6 +61,14 @@ export class AnalysisStore {
     this.state = {
       ...this.state,
       selectedRootCauseKey: anomalyKey,
+    };
+    this.emitter.fire();
+  }
+
+  setGeneratedIssueDraft(generatedIssueDraft: GeneratedIssueDraft | undefined): void {
+    this.state = {
+      ...this.state,
+      generatedIssueDraft,
     };
     this.emitter.fire();
   }

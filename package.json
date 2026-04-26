@@ -24,6 +24,7 @@
     "onCommand:testAnalysisAgent.loadLogOnly",
     "onCommand:testAnalysisAgent.runPhase1Analysis",
     "onCommand:testAnalysisAgent.runRootCauseAnalysis",
+    "onCommand:testAnalysisAgent.generateGitLabIssueDescription",
     "onCommand:testAnalysisAgent.createGitLabIssues",
     "onCommand:testAnalysisAgent.showDiagnostics",
     "onCommand:testAnalysisAgent.copyLastDiagnosticMessage",
@@ -47,6 +48,11 @@
       {
         "command": "testAnalysisAgent.runRootCauseAnalysis",
         "title": "Run Root Cause Analysis",
+        "category": "Test Analysis Agent"
+      },
+      {
+        "command": "testAnalysisAgent.generateGitLabIssueDescription",
+        "title": "Generate GitLab Issue Description",
         "category": "Test Analysis Agent"
       },
       {

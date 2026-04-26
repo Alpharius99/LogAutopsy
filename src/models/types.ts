@@ -149,6 +149,12 @@ export interface IssueCandidate {
   rootCause: RootCauseAnalysis;
 }
 
+export interface GeneratedIssueDraft {
+  anomalyKey: string;
+  title: string;
+  description: string;
+}
+
 export interface GitLabIssueRequest {
   baseUrl: string;
   projectId: string;
@@ -170,4 +176,5 @@ export interface AnalysisStoreState {
   phase1?: Phase1Result;
   rootCauses: RootCauseAnalysis[];
   selectedRootCauseKey?: string;
+  generatedIssueDraft?: GeneratedIssueDraft;
 }

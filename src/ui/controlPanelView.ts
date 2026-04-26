@@ -5,6 +5,7 @@ type ControlCommand =
   | 'testAnalysisAgent.loadLogOnly'
   | 'testAnalysisAgent.runPhase1Analysis'
   | 'testAnalysisAgent.runRootCauseAnalysis'
+  | 'testAnalysisAgent.generateGitLabIssueDescription'
   | 'testAnalysisAgent.createGitLabIssues'
   | 'testAnalysisAgent.copyContinuePrompt';
 
@@ -72,6 +73,11 @@ export class TestAnalysisControlPanelProvider implements vscode.WebviewViewProvi
     const selectedRootCause =
       state.rootCauses.find((item) => item.anomalyKey === state.selectedRootCauseKey) ?? state.rootCauses[0];
     const promptPreview = selectedRootCause?.continuePrompt ?? '';
+    const issueDraftPreview =
+      state.generatedIssueDraft &&
+      state.generatedIssueDraft.anomalyKey === selectedRootCause?.anomalyKey
+        ? state.generatedIssueDraft.description
+        : 'No GitLab issue description generated yet.';
     const promptListHtml =
       state.rootCauses.length > 0
         ? state.rootCauses
@@ -290,6 +296,12 @@ export class TestAnalysisControlPanelProvider implements vscode.WebviewViewProvi
           !state.artifact
         )}
         ${this.buttonHtml(
+          'Generate GitLab Issue Description',
+          'testAnalysisAgent.generateGitLabIssueDescription',
+          state.rootCauses.length === 0,
+          'secondary'
+        )}
+        ${this.buttonHtml(
           'Create GitLab Issues',
           'testAnalysisAgent.createGitLabIssues',
           state.rootCauses.length === 0,
@@ -332,6 +344,12 @@ export class TestAnalysisControlPanelProvider implements vscode.WebviewViewProvi
         )}
       </div>
       <pre>${escapeHtml(promptPreview || 'No Continue prompt selected yet.')}</pre>
+    </section>
+
+    <section class="card">
+      <div class="eyebrow">GitLab Draft</div>
+      <p>Generate a Markdown issue description before publishing it to GitLab.</p>
+      <pre>${escapeHtml(issueDraftPreview)}</pre>
     </section>
   </div>
 

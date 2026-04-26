@@ -20,6 +20,16 @@ const SHOW_DIAGNOSTICS_ACTION = 'Show Diagnostics';
 const COPY_DIAGNOSTIC_ACTION = 'Copy Diagnostic';
 const COPY_CONTINUE_PROMPT_ACTION = 'Copy Continue Prompt';
 
+function currentOrSelectedRootCause(
+  store: AnalysisStore
+): RootCauseAnalysis | undefined {
+  const state = store.getState();
+  return (
+    state.rootCauses.find((item) => item.anomalyKey === state.selectedRootCauseKey) ??
+    state.rootCauses[0]
+  );
+}
+
 async function ensureArtifact(store: AnalysisStore) {
   const state = store.getState();
   if (state.artifact) {
@@ -70,6 +80,26 @@ async function selectRootCause(rootCauses: RootCauseAnalysis[]): Promise<RootCau
   );
 
   return picked?.result;
+}
+
+async function generateGitLabIssueDraft(
+  store: AnalysisStore,
+  selected: RootCauseAnalysis
+): Promise<void> {
+  const state = store.getState();
+  const issue = buildIssueCandidate(selected, state.phase1);
+  store.setGeneratedIssueDraft({
+    anomalyKey: selected.anomalyKey,
+    title: issue.title,
+    description: issue.description,
+  });
+  await vscode.env.clipboard.writeText(issue.description);
+  const document = await vscode.workspace.openTextDocument({
+    language: 'markdown',
+    content: `# ${issue.title}\n\n${issue.description}`,
+  });
+  await vscode.window.showTextDocument(document, { preview: true });
+  vscode.window.showInformationMessage('GitLab issue description generated and copied to clipboard.');
 }
 
 async function copyContinuePrompt(result: RootCauseAnalysis): Promise<void> {
@@ -126,9 +156,7 @@ export function registerCommands(
         throw new Error('Run root cause analysis first to prepare a Continue prompt.');
       }
 
-      const selected =
-        state.rootCauses.find((item) => item.anomalyKey === state.selectedRootCauseKey) ??
-        (await selectRootCause(state.rootCauses));
+      const selected = currentOrSelectedRootCause(store) ?? (await selectRootCause(state.rootCauses));
       if (!selected) {
         return;
       }
@@ -212,13 +240,33 @@ export function registerCommands(
           const selected =
             results.length === 1
               ? results[0]
-              : (results.find((item) => item.anomalyKey === store.getState().selectedRootCauseKey) ??
-                (await selectRootCause(results)));
+              : (currentOrSelectedRootCause(store) ?? (await selectRootCause(results)));
           if (selected) {
             store.setSelectedRootCause(selected.anomalyKey);
             await copyContinuePrompt(selected);
           }
         }
+      } catch (error) {
+        void handleCommandError(error);
+      }
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('testAnalysisAgent.generateGitLabIssueDescription', async () => {
+      try {
+        const state = store.getState();
+        if (state.rootCauses.length === 0) {
+          throw new Error('Run root cause analysis before generating a GitLab issue description.');
+        }
+
+        const selected = currentOrSelectedRootCause(store) ?? (await selectRootCause(state.rootCauses));
+        if (!selected) {
+          return;
+        }
+
+        store.setSelectedRootCause(selected.anomalyKey);
+        await generateGitLabIssueDraft(store, selected);
       } catch (error) {
         void handleCommandError(error);
       }
@@ -233,7 +281,7 @@ export function registerCommands(
           throw new Error('Run root cause analysis before creating a GitLab issue.');
         }
 
-        const selected = await selectRootCause(state.rootCauses);
+        const selected = currentOrSelectedRootCause(store) ?? (await selectRootCause(state.rootCauses));
         if (!selected) {
           return;
         }
@@ -246,7 +294,13 @@ export function registerCommands(
           throw new Error('Configure testAnalysisAgent.gitlab.baseUrl, projectId, and token first.');
         }
 
-        const issue = buildIssueCandidate(selected);
+        store.setSelectedRootCause(selected.anomalyKey);
+        const issue = buildIssueCandidate(selected, state.phase1);
+        store.setGeneratedIssueDraft({
+          anomalyKey: selected.anomalyKey,
+          title: issue.title,
+          description: issue.description,
+        });
         const created = await createGitLabIssue({
           baseUrl,
           projectId,
