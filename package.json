@@ -21,7 +21,6 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:testAnalysisAgent.loadTestArtifacts",
     "onCommand:testAnalysisAgent.loadLogOnly",
     "onCommand:testAnalysisAgent.runPhase1Analysis",
     "onCommand:testAnalysisAgent.runRootCauseAnalysis",
@@ -35,11 +34,6 @@
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
-      {
-        "command": "testAnalysisAgent.loadTestArtifacts",
-        "title": "Load Full Input",
-        "category": "Test Analysis Agent"
-      },
       {
         "command": "testAnalysisAgent.loadLogOnly",
         "title": "Load Log Only",

@@ -85,9 +85,7 @@ export class LogAutopsySidebarProvider implements vscode.TreeDataProvider<Sideba
         vscode.TreeItemCollapsibleState.None,
         [],
         state.artifact
-          ? state.artifact.featureUri
-            ? `${compactText(state.artifact.name, 32)} • full`
-            : `${compactText(state.artifact.name, 32)} • lite`
+          ? `${compactText(state.artifact.name, 32)} • log`
           : 'Derived from current analysis'
       ),
     ];

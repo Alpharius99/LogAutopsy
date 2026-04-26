@@ -1,13 +1,13 @@
 # test-analysis-agent
 
-`test-analysis-agent` is a VS Code extension for investigating automated test failures from combined log files and optional Gherkin feature files. It performs deterministic anomaly analysis first, then runs a bounded AI-assisted root cause workflow, and can turn the result into a GitLab issue.
+`test-analysis-agent` is a VS Code extension for investigating automated test failures from log files. It performs deterministic anomaly analysis first, then runs a bounded AI-assisted root cause workflow, and can turn the result into a GitLab issue.
 
 ## Overview
 
 The extension is built around a two-phase pipeline:
 
 1. `Phase 1` is deterministic and local.
-   It parses the combined log, maps events to Gherkin steps and phases, detects anomalies, and aggregates repeated failures.
+   It parses the log, builds step context from the log stream, detects anomalies, and aggregates repeated failures.
 2. `Phase 2` is AI-assisted.
    It resolves likely C# source locations in the open workspace, extracts bounded method context, runs a structured multi-step Continue workflow through the VS Code language model API, validates strict JSON responses, and produces a final root cause result.
 
@@ -44,52 +44,28 @@ The results view also shows welcome-style quick actions when no analysis output 
 
 ## Commands
 
-- `Test Analysis Agent: Load Test Artifacts`
+- `Test Analysis Agent: Load Log Only`
 - `Test Analysis Agent: Run Phase 1 Analysis`
 - `Test Analysis Agent: Run Root Cause Analysis`
 - `Test Analysis Agent: Create GitLab Issues`
 
-## Expected Artifact Layout
+## Expected Input
 
-The engine expects a test case folder containing both:
-
-- one combined log file matching `*_YYMMDD_HHMMSS.log`
-- optionally one `.feature` file in the same folder
-
-Example layout:
-
-```text
-BatchRun_YYMMDD_HHMMSS/
-  <TestName>_YYMMDD_HHMMSS/
-    <TestName>.feature
-    <TestName>_YYMMDD_HHMMSS.log
-    <TestName>_YYMMDD_HHMMSS.html
-    appsettings.json
-    YYMMDD_HHMMSS_Precondition/
-    YYMMDD_HHMMSS_TestCase/
-    YYMMDD_HHMMSS_PostCondition/
-```
-
-Ignored by the engine:
-
-- per-phase subfolder logs
-- HTML reports
-- unrelated files in the artifact folder
+The engine expects a `.log` file selected directly from the file picker.
 
 ## Analysis Flow
 
 ### Phase 1: Deterministic
 
-Inputs:
+Input:
 
-- combined log
-- optional Gherkin feature file
+- log file
 
 Behavior:
 
 - parse log entries and continuation lines
 - detect anomalies
-- build step contexts and phase mapping
+- build step contexts from the log
 - assign each anomaly to the active step
 - aggregate recurring anomalies
 
@@ -185,14 +161,13 @@ code --install-extension test-analysis-agent-0.1.0.vsix
 Typical workflow:
 
 1. Open the `Test Analysis` view container.
-2. Click `Load Test Artifacts`.
-3. Select the folder containing the test run.
-4. If multiple test case folders are found, choose the artifact pair to analyze.
-5. Run `Phase 1 Analysis`.
-6. Review steps and grouped anomalies in `Analysis Results`.
-7. Run `Root Cause Analysis`.
-8. Review the AI result set.
-9. Run `Create GitLab Issues` and choose the root cause result to publish.
+2. Click `Load Log Only`.
+3. Select the `.log` file to analyze.
+4. Run `Phase 1 Analysis`.
+5. Review steps and grouped anomalies in `Analysis Results`.
+6. Run `Root Cause Analysis`.
+7. Review the AI result set.
+8. Run `Create GitLab Issues` and choose the root cause result to publish.
 
 You can use either:
 

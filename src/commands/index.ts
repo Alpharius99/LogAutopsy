@@ -7,7 +7,7 @@ import { runRootCauseAnalysis as runAiRootCauseAnalysis } from '../ai/agentRunne
 import { createGitLabIssue } from '../gitlab/gitlabClient';
 import { buildIssueCandidate } from '../gitlab/issueBuilder';
 import { AnalysisStore } from '../utils/analysisStore';
-import { pickArtifacts, pickLogOnlyArtifact, readUriText } from '../utils/artifacts';
+import { pickLogOnlyArtifact, readUriText } from '../utils/artifacts';
 import {
   formatDiagnosticError,
   getLastDiagnosticMessage,
@@ -26,7 +26,7 @@ async function ensureArtifact(store: AnalysisStore) {
     return state.artifact;
   }
 
-  const artifact = await pickArtifacts();
+  const artifact = await pickLogOnlyArtifact();
   if (!artifact) {
     return undefined;
   }
@@ -140,22 +140,6 @@ export function registerCommands(
   context.subscriptions.push(
     vscode.commands.registerCommand('testAnalysisAgent.selectRootCausePrompt', (anomalyKey?: string) => {
       store.setSelectedRootCause(anomalyKey);
-    })
-  );
-
-  context.subscriptions.push(
-    vscode.commands.registerCommand('testAnalysisAgent.loadTestArtifacts', async () => {
-      try {
-        const artifact = await pickArtifacts();
-        if (!artifact) {
-          return;
-        }
-
-        store.setArtifact(artifact);
-        vscode.window.showInformationMessage(`Loaded artifacts for ${artifact.name}.`);
-      } catch (error) {
-        void handleCommandError(error);
-      }
     })
   );
 

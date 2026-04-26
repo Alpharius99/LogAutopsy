@@ -2,7 +2,6 @@ import * as vscode from 'vscode';
 import type { AnalysisStore } from '../utils/analysisStore';
 
 type ControlCommand =
-  | 'testAnalysisAgent.loadTestArtifacts'
   | 'testAnalysisAgent.loadLogOnly'
   | 'testAnalysisAgent.runPhase1Analysis'
   | 'testAnalysisAgent.runRootCauseAnalysis'
@@ -60,15 +59,9 @@ export class TestAnalysisControlPanelProvider implements vscode.WebviewViewProvi
     const state = this.store.getState();
     const nonce = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
     const artifactName = state.artifact
-      ? state.artifact.featureUri
-        ? `${state.artifact.name} (log + feature)`
-        : `${state.artifact.name} (log only)`
+      ? `${state.artifact.name} (log only)`
       : 'No artifacts loaded';
-    const inputMode = state.artifact
-      ? state.artifact.featureUri
-        ? 'Full input'
-        : 'Lite input'
-      : 'No input selected';
+    const inputMode = state.artifact ? 'Log only' : 'No input selected';
     const phase1Summary = state.phase1
       ? `${state.phase1.aggregated.length} grouped anomalies across ${state.phase1.steps.length} steps`
       : 'Phase 1 has not been run yet';
@@ -189,12 +182,6 @@ export class TestAnalysisControlPanelProvider implements vscode.WebviewViewProvi
       margin-top: 12px;
     }
 
-    .button-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-
     button {
       width: 100%;
       border: none;
@@ -288,13 +275,10 @@ export class TestAnalysisControlPanelProvider implements vscode.WebviewViewProvi
     <section class="card">
       <div class="eyebrow">Test Analysis Agent</div>
       <h2>Control Panel</h2>
-      <p>Choose full input for log + feature discovery, or lite input when the log file is enough.</p>
+      <p>Load a log file, then run the analysis workflow.</p>
       <div class="pill">${escapeHtml(state.artifact ? inputMode : 'Waiting for input')}</div>
       <div class="button-list">
-        <div class="button-row">
-          ${this.buttonHtml('Load Full Input', 'testAnalysisAgent.loadTestArtifacts')}
-          ${this.buttonHtml('Load Log Only', 'testAnalysisAgent.loadLogOnly')}
-        </div>
+        ${this.buttonHtml('Load Log Only', 'testAnalysisAgent.loadLogOnly')}
         ${this.buttonHtml(
           'Run Phase 1 Analysis',
           'testAnalysisAgent.runPhase1Analysis',
