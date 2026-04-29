@@ -42,6 +42,14 @@ The extension contributes a `Test Analysis` activity bar container with two view
 
 The results view also shows welcome-style quick actions when no analysis output exists yet, and both views expose title-bar command buttons.
 
+## Icon Assets
+
+The extension icon represents a crashed run trace being followed to a root-cause point.
+
+- `media/icon.svg` is the monochrome, theme-aware icon used in the VS Code activity bar.
+- `media/icon.png` is the 128x128 package and marketplace icon referenced by `package.json`.
+- `media/icon-marketplace.svg` is the editable source used to regenerate `media/icon.png`.
+
 ## Commands
 
 - `Test Analysis Agent: Load Log Only`
